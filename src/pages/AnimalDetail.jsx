@@ -29,46 +29,133 @@ function TaxonomyRow({ label, value }) {
 
 function ImageGallery({ images, name }) {
   const [active, setActive] = useState(0)
+  const [lightbox, setLightbox] = useState(false)
   const imgs = (images || []).filter(Boolean)
   if (!imgs.length) return null
 
   return (
-    <div>
-      <div className="relative w-full overflow-hidden bg-black" style={{ aspectRatio: '16/7' }}>
-        <img key={active} src={imgs[active]} alt={`${name} photo ${active + 1}`}
-          className="w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent pointer-events-none" />
-        {imgs.length > 1 && (
-          <>
-            <button onClick={() => setActive(i => (i - 1 + imgs.length) % imgs.length)}
-              aria-label="Previous"
-              className="absolute left-3 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/70 text-white rounded-full w-9 h-9 flex items-center justify-center border border-white/20 backdrop-blur-sm transition-all">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7"/></svg>
-            </button>
-            <button onClick={() => setActive(i => (i + 1) % imgs.length)}
-              aria-label="Next"
-              className="absolute right-3 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/70 text-white rounded-full w-9 h-9 flex items-center justify-center border border-white/20 backdrop-blur-sm transition-all">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7"/></svg>
-            </button>
+    <>
+      <div>
+        {/* Main image */}
+        <div className="relative w-full overflow-hidden bg-black" style={{ aspectRatio: '16/7' }}>
+          <img
+            key={active}
+            src={imgs[active]}
+            alt={`${name} photo ${active + 1}`}
+            className="w-full h-full object-cover cursor-zoom-in"
+            onClick={() => setLightbox(true)}
+            title="Click to enlarge"
+          />
+
+          {/* Expand hint */}
+          <button
+            onClick={() => setLightbox(true)}
+            className="absolute top-3 left-3 bg-black/50 hover:bg-black/75 backdrop-blur-sm text-white text-xs px-2.5 py-1.5 rounded-full flex items-center gap-1.5 transition-all"
+            aria-label="Enlarge image"
+          >
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/>
+            </svg>
+            Enlarge
+          </button>
+
+          {/* Counter */}
+          {imgs.length > 1 && (
             <div className="absolute top-3 right-3 bg-black/50 text-white text-xs px-2.5 py-1 rounded-full backdrop-blur-sm">
               {active + 1} / {imgs.length}
             </div>
-          </>
+          )}
+
+          {/* Prev/Next arrows */}
+          {imgs.length > 1 && (
+            <>
+              <button onClick={() => setActive(i => (i - 1 + imgs.length) % imgs.length)}
+                aria-label="Previous"
+                className="absolute left-3 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/70 text-white rounded-full w-9 h-9 flex items-center justify-center border border-white/20 backdrop-blur-sm transition-all">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7"/></svg>
+              </button>
+              <button onClick={() => setActive(i => (i + 1) % imgs.length)}
+                aria-label="Next"
+                className="absolute right-3 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/70 text-white rounded-full w-9 h-9 flex items-center justify-center border border-white/20 backdrop-blur-sm transition-all">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7"/></svg>
+              </button>
+            </>
+          )}
+        </div>
+
+        {/* Thumbnails */}
+        {imgs.length > 1 && (
+          <div className="flex gap-2 p-3 bg-gray-50 border-t border-gray-100 overflow-x-auto">
+            {imgs.map((src, i) => (
+              <button key={i} onClick={() => setActive(i)}
+                className={`flex-shrink-0 w-16 h-11 sm:w-20 sm:h-14 rounded-lg overflow-hidden border-2 transition-all ${
+                  i === active ? 'border-green-500 shadow-md' : 'border-transparent opacity-50 hover:opacity-80'
+                }`}>
+                <img src={src} alt="" className="w-full h-full object-cover" />
+              </button>
+            ))}
+          </div>
         )}
       </div>
-      {imgs.length > 1 && (
-        <div className="flex gap-2 p-3 bg-gray-50 border-t border-gray-100 overflow-x-auto">
-          {imgs.map((src, i) => (
-            <button key={i} onClick={() => setActive(i)}
-              className={`flex-shrink-0 w-16 h-11 sm:w-20 sm:h-14 rounded-lg overflow-hidden border-2 transition-all ${
-                i === active ? 'border-green-500 shadow-md' : 'border-transparent opacity-50 hover:opacity-80'
-              }`}>
-              <img src={src} alt="" className="w-full h-full object-cover" />
-            </button>
-          ))}
+
+      {/* Lightbox */}
+      {lightbox && (
+        <div
+          className="fixed inset-0 z-50 bg-black/90 flex flex-col items-center justify-center"
+          onClick={() => setLightbox(false)}
+        >
+          {/* Close */}
+          <button
+            className="absolute top-4 right-4 text-white bg-white/10 hover:bg-white/25 rounded-full w-10 h-10 flex items-center justify-center transition-all"
+            onClick={() => setLightbox(false)}
+            aria-label="Close"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+
+          {/* Image */}
+          <img
+            src={imgs[active]}
+            alt={`${name} photo ${active + 1}`}
+            className="max-w-[95vw] max-h-[85vh] object-contain rounded-xl shadow-2xl"
+            onClick={e => e.stopPropagation()}
+          />
+
+          {/* Name below image */}
+          <p className="text-white/70 text-sm mt-3">{name} — photo {active + 1} of {imgs.length}</p>
+
+          {/* Arrows in lightbox */}
+          {imgs.length > 1 && (
+            <>
+              <button
+                onClick={e => { e.stopPropagation(); setActive(i => (i - 1 + imgs.length) % imgs.length) }}
+                className="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/25 text-white rounded-full w-11 h-11 flex items-center justify-center transition-all"
+                aria-label="Previous">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7"/></svg>
+              </button>
+              <button
+                onClick={e => { e.stopPropagation(); setActive(i => (i + 1) % imgs.length) }}
+                className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/25 text-white rounded-full w-11 h-11 flex items-center justify-center transition-all"
+                aria-label="Next">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7"/></svg>
+              </button>
+            </>
+          )}
+
+          {/* Thumbnail dots */}
+          {imgs.length > 1 && (
+            <div className="flex gap-2 mt-3" onClick={e => e.stopPropagation()}>
+              {imgs.map((_, i) => (
+                <button key={i} onClick={() => setActive(i)}
+                  className={`rounded-full transition-all ${i === active ? 'bg-green-400 w-5 h-2.5' : 'bg-white/40 w-2.5 h-2.5 hover:bg-white/70'}`} />
+              ))}
+            </div>
+          )}
         </div>
       )}
-    </div>
+    </>
   )
 }
 
@@ -134,10 +221,11 @@ export default function AnimalDetail() {
         <div className="bg-white rounded-2xl sm:rounded-3xl shadow-xl overflow-hidden border border-green-100">
 
           {allImages.length > 0 ? (
-            <div className="relative">
+            <div>
               <ImageGallery images={allImages} name={animal.name} />
-              <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 pointer-events-none">
-                <div className="flex flex-wrap items-center gap-2 mb-1.5">
+              {/* Name + badges — below gallery, never overlapping thumbnails */}
+              <div className="bg-gradient-to-r from-green-900 to-green-700 px-5 sm:px-8 py-5">
+                <div className="flex flex-wrap items-center gap-2 mb-2">
                   <span className="bg-white/20 backdrop-blur text-white text-xs px-2.5 py-1 rounded-full border border-white/30">
                     {category?.icon} {translatedCat}
                   </span>
@@ -152,8 +240,8 @@ export default function AnimalDetail() {
                     </span>
                   )}
                 </div>
-                <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white drop-shadow-lg">{animal.name}</h1>
-                <p className="text-green-200 italic text-sm sm:text-base mt-0.5">{animal.scientificName}</p>
+                <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white leading-tight">{animal.name}</h1>
+                <p className="text-green-300 italic text-sm sm:text-base mt-1">{animal.scientificName}</p>
               </div>
             </div>
           ) : (
