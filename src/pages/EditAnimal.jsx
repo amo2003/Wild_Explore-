@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useAnimals } from '../context/AnimalContext'
 import { CATEGORIES } from '../data/animals'
@@ -33,34 +33,45 @@ export default function EditAnimal() {
   const { animals, updateAnimal, deleteAnimal } = useAnimals()
   const navigate = useNavigate()
   const { tr, t } = useLang()
-  const animal = animals.map(a => ({ ...a, id: String(a._id || a.id) })).find(a => a.id === id)
+
+  // Normalise _id → id for lookup
+  const animal = animals
+    .map(a => ({ ...a, id: String(a._id || a.id) }))
+    .find(a => a.id === id)
+
   const [form, setForm] = useState(null)
   const [errors, setErrors] = useState({})
+  const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
+  const [saveError, setSaveError] = useState('')
   const [confirmDelete, setConfirmDelete] = useState(false)
 
+  // ── Init form ONCE when the animal is first found ────────────────────────
+  // Using a ref flag prevents re-initialisation on every render cycle
+  const initialized = useRef(false)
   useEffect(() => {
-    if (!animal) return
+    if (!animal || initialized.current) return
+    initialized.current = true
     setForm({
-      name: animal.name || '',
-      scientificName: animal.scientificName || '',
-      category: animal.category || '',
+      name:               animal.name               || '',
+      scientificName:     animal.scientificName     || '',
+      category:           animal.category           || '',
       conservationStatus: animal.conservationStatus || '',
-      origin: animal.origin || '',
-      className: animal.className || '',
-      order: animal.order || '',
-      suborder: animal.suborder || '',
-      family: animal.family || '',
-      subfamily: animal.subfamily || '',
-      averageWeight: animal.averageWeight || '',
-      averageHeight: animal.averageHeight || '',
-      maleWeight:    animal.maleWeight    || '',
-      femaleWeight:  animal.femaleWeight  || '',
-      maleHeight:    animal.maleHeight    || '',
-      femaleHeight:  animal.femaleHeight  || '',
-      birthArea: animal.birthArea || '',
-      food: animal.food || '',
-      description: animal.description || '',
+      origin:             animal.origin             || '',
+      className:          animal.className          || '',
+      order:              animal.order              || '',
+      suborder:           animal.suborder           || '',
+      family:             animal.family             || '',
+      subfamily:          animal.subfamily          || '',
+      maleWeight:         animal.maleWeight         || '',
+      femaleWeight:       animal.femaleWeight       || '',
+      maleHeight:         animal.maleHeight         || '',
+      femaleHeight:       animal.femaleHeight       || '',
+      averageWeight:      animal.averageWeight      || '',
+      averageHeight:      animal.averageHeight      || '',
+      birthArea:          animal.birthArea          || '',
+      food:               animal.food               || '',
+      description:        animal.description        || '',
       images: animal.images?.length
         ? [...animal.images, '', ''].slice(0, 3)
         : [animal.image || '', '', ''],
@@ -95,24 +106,32 @@ export default function EditAnimal() {
   function validate() {
     const required = ['name', 'scientificName', 'category', 'maleWeight', 'maleHeight', 'birthArea', 'food']
     const errs = {}
-    required.forEach(f => { if (!form[f].trim()) errs[f] = tr(t.form.required) })
+    required.forEach(f => { if (!form[f]?.trim()) errs[f] = tr(t.form.required) })
     return errs
   }
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault()
     const errs = validate()
     if (Object.keys(errs).length) { setErrors(errs); return }
-    const cleanImages = form.images.filter(u => u.trim())
-    updateAnimal(id, {
-      ...form,
-      images: cleanImages,
-      image: cleanImages[0] || '',
-      averageWeight: form.maleWeight || form.femaleWeight || '',
-      averageHeight: form.maleHeight || form.femaleHeight || '',
-    })
-    setSaved(true)
-    setTimeout(() => navigate(`/animals/${id}`), 1200)
+    setSaving(true)
+    setSaveError('')
+    try {
+      const cleanImages = form.images.filter(u => u.trim())
+      await updateAnimal(id, {
+        ...form,
+        images: cleanImages,
+        image: cleanImages[0] || '',
+        averageWeight: form.maleWeight || form.femaleWeight || '',
+        averageHeight: form.maleHeight || form.femaleHeight || '',
+      })
+      setSaved(true)
+      setTimeout(() => navigate(`/animals/${id}`), 1200)
+    } catch (err) {
+      setSaveError(err.message || 'Failed to save. Try again.')
+    } finally {
+      setSaving(false)
+    }
   }
 
   const taxFields = [
@@ -136,7 +155,7 @@ export default function EditAnimal() {
       </div>
 
       {saved && (
-        <div className="bg-green-600 text-white text-center py-3 text-sm font-semibold animate-pulse">
+        <div className="bg-green-600 text-white text-center py-3 text-sm font-semibold">
           {tr(t.form.savedMsg)}
         </div>
       )}
@@ -144,6 +163,7 @@ export default function EditAnimal() {
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
         <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
 
+          {/* ── 1 Basic ── */}
           <div className="bg-white rounded-2xl shadow-sm border border-green-100 p-5 sm:p-7">
             <SectionHeader title={tr(t.form.sec1)} />
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -172,7 +192,6 @@ export default function EditAnimal() {
                   ))}
                 </select>
               </Field>
-
               <Field label={tr(t.form.originLabel)}>
                 <select name="origin" value={form.origin} onChange={handleChange} className={inputClass}>
                   <option value="">{tr(t.form.selectOrigin)}</option>
@@ -183,6 +202,7 @@ export default function EditAnimal() {
             </div>
           </div>
 
+          {/* ── 2 Taxonomy ── */}
           <div className="bg-white rounded-2xl shadow-sm border border-green-100 p-5 sm:p-7">
             <SectionHeader title={tr(t.form.sec2)} />
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -195,10 +215,9 @@ export default function EditAnimal() {
             </div>
           </div>
 
+          {/* ── 3 Physical ── */}
           <div className="bg-white rounded-2xl shadow-sm border border-green-100 p-5 sm:p-7">
             <SectionHeader title={tr(t.form.sec3)} />
-
-            {/* Weight */}
             <div className="mb-4">
               <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">⚖️ {tr(t.form.avgWeight)}</p>
               <div className="grid grid-cols-2 gap-3">
@@ -213,8 +232,6 @@ export default function EditAnimal() {
                 </Field>
               </div>
             </div>
-
-            {/* Height */}
             <div className="mb-4">
               <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">📏 {tr(t.form.avgHeight)}</p>
               <div className="grid grid-cols-2 gap-3">
@@ -229,7 +246,6 @@ export default function EditAnimal() {
                 </Field>
               </div>
             </div>
-
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="sm:col-span-2">
                 <Field label={tr(t.form.birthArea)} required error={errors.birthArea}>
@@ -246,6 +262,7 @@ export default function EditAnimal() {
             </div>
           </div>
 
+          {/* ── 4 Images ── */}
           <div className="bg-white rounded-2xl shadow-sm border border-green-100 p-5 sm:p-7">
             <SectionHeader title={tr(t.form.sec4)} />
             <p className="text-xs text-gray-400 mb-4">{tr(t.form.imagesHint)}</p>
@@ -268,16 +285,31 @@ export default function EditAnimal() {
             </div>
           </div>
 
+          {/* ── 5 Description ── */}
           <div className="bg-white rounded-2xl shadow-sm border border-green-100 p-5 sm:p-7">
             <SectionHeader title={tr(t.form.sec5)} />
             <textarea name="description" value={form.description} onChange={handleChange} rows={4}
               className={`${inputClass} resize-none`} placeholder="..." />
           </div>
 
+          {/* ── Actions ── */}
+          {saveError && (
+            <div className="bg-red-50 border border-red-300 text-red-700 text-sm rounded-xl px-4 py-3">
+              ❌ {saveError}
+            </div>
+          )}
           <div className="flex flex-col sm:flex-row gap-3">
-            <button type="submit"
-              className="flex-1 bg-green-700 hover:bg-green-800 text-white font-bold py-3.5 rounded-xl transition-all text-sm sm:text-base">
-              {tr(t.form.saveChanges)}
+            <button type="submit" disabled={saving}
+              className="flex-1 bg-green-700 hover:bg-green-800 disabled:opacity-60 text-white font-bold py-3.5 rounded-xl transition-all text-sm sm:text-base flex items-center justify-center gap-2">
+              {saving ? (
+                <>
+                  <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+                  </svg>
+                  Saving…
+                </>
+              ) : tr(t.form.saveChanges)}
             </button>
             <Link to={`/animals/${id}`}
               className="sm:w-32 text-center border border-gray-300 text-gray-600 hover:bg-gray-50 font-semibold py-3.5 rounded-xl transition-all text-sm">
@@ -294,13 +326,9 @@ export default function EditAnimal() {
               {tr(t.form.dangerZone)}
             </h3>
             <p className="text-xs text-red-500 mb-4">{tr(t.form.deleteWarning)}</p>
-
             {!confirmDelete ? (
-              <button
-                type="button"
-                onClick={() => setConfirmDelete(true)}
-                className="flex items-center gap-2 bg-white border-2 border-red-300 text-red-600 hover:bg-red-600 hover:text-white font-semibold px-5 py-2.5 rounded-xl transition-all text-sm"
-              >
+              <button type="button" onClick={() => setConfirmDelete(true)}
+                className="flex items-center gap-2 bg-white border-2 border-red-300 text-red-600 hover:bg-red-600 hover:text-white font-semibold px-5 py-2.5 rounded-xl transition-all text-sm">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                 </svg>
@@ -312,21 +340,13 @@ export default function EditAnimal() {
                   🗑️ {tr(t.form.deleteConfirm)} <span className="text-red-900">"{animal.name}"</span>?
                 </p>
                 <div className="flex gap-3">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      deleteAnimal(id)
-                      navigate('/animals')
-                    }}
-                    className="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 rounded-xl transition-all text-sm"
-                  >
+                  <button type="button"
+                    onClick={() => { deleteAnimal(id); navigate('/animals') }}
+                    className="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 rounded-xl transition-all text-sm">
                     {tr(t.form.confirmYes)}
                   </button>
-                  <button
-                    type="button"
-                    onClick={() => setConfirmDelete(false)}
-                    className="flex-1 border border-gray-300 text-gray-600 hover:bg-gray-50 font-semibold py-2.5 rounded-xl transition-all text-sm"
-                  >
+                  <button type="button" onClick={() => setConfirmDelete(false)}
+                    className="flex-1 border border-gray-300 text-gray-600 hover:bg-gray-50 font-semibold py-2.5 rounded-xl transition-all text-sm">
                     {tr(t.form.confirmNo)}
                   </button>
                 </div>
