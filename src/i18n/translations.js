@@ -1,6 +1,3 @@
-import About from "../pages/About"
-import Contact from "../pages/Contact"
-
 export const LANGUAGES = [
   { code: 'en', label: 'English', flag: '🇬🇧', nativeLabel: 'English' },
   { code: 'si', label: 'Sinhala', flag: '🇱🇰', nativeLabel: 'සිංහල' },
@@ -72,16 +69,12 @@ export const t = {
   // ── Animal Detail ────────────────────────────────────
   detail: {
     about:        { en: 'About',                 si: 'ගැන',               ta: 'பற்றி' },
-    avgWeight:    { en: 'Avg Weight',     si: 'සාමාන්‍ය බර',     ta: 'சராசரி எடை' },
-    avgHeight:    { en: 'Avg Height',     si: 'සාමාන්‍ය උස',      ta: 'சராசரி உயரம்' },
-    maleWeight:   { en: 'Male Weight',    si: 'පිරිමි බර',        ta: 'ஆண் எடை' },
-    femaleWeight: { en: 'Female Weight',  si: 'ගැහැණු  බර',        ta: 'பெண் எடை' },
-    maleHeight:   { en: 'Male Height / Length',    si: 'පිරිමි උස / දිග',         ta: 'ஆண் உயரம் / லெங்' },
-    femaleHeight: { en: 'Female Height / Length',  si: 'ගැහැණු  උස / දිග',         ta: 'பெண் உயரம் / லெங்' },
-    maleWeight:   { en: 'Male Weight',    si: 'පිරිමි බර',       ta: 'ஆண் எடை' },
-    femaleWeight: { en: 'Female Weight',  si: 'ගැහැණු  බර',       ta: 'பெண் எடை' },
-    maleHeight:   { en: 'Male Height / Length',    si: 'පිරිමි උස / දිග',        ta: 'ஆண் உயரம் / லெங்' },
-    femaleHeight: { en: 'Female Height / Length',  si: 'ගැහැණු  උස / දිග',        ta: 'பெண் உயரம் / லெங்' },
+    avgWeight:    { en: 'Avg Weight',            si: 'සාමාන්‍ය බර',       ta: 'சராசரி எடை' },
+    avgHeight:    { en: 'Avg Height / Length',   si: 'සාමාන්‍ය උස / දිග',  ta: 'சராசரி உயரம் / நீளம்' },
+    maleWeight:   { en: 'Male Weight',           si: 'පිරිමි බර',          ta: 'ஆண் எடை' },
+    femaleWeight: { en: 'Female Weight',         si: 'ගැහැණු බර',          ta: 'பெண் எடை' },
+    maleHeight:   { en: 'Male Height / Length',  si: 'පිරිමි උස / දිග',    ta: 'ஆண் உயரம் / நீளம்' },
+    femaleHeight: { en: 'Female Height / Length',si: 'ගැහැණු උස / දිග',    ta: 'பெண் உயரம் / நீளம்' },
     habitat:      { en: 'Habitat',               si: 'ජීවන වාසය',          ta: 'வாசஸ்தலம்' },
     diet:         { en: 'Diet',                  si: 'ආහාර',               ta: 'உணவு' },
     taxonomy:     { en: 'Taxonomy Classification', si: 'වර්ගීකරණ හඳුනාගැනීම', ta: 'வகைப்படுத்தல்' },
@@ -130,12 +123,12 @@ export const t = {
     family:       { en: 'Family',   si: 'කුලය',      ta: 'குடும்பம்' },
     subfamily:    { en: 'Subfamily', si: 'උප කුලය',  ta: 'உப குடும்பம்' },
     optional:     { en: 'Optional', si: 'විකල්ප',    ta: 'விரும்பினால்' },
-    avgWeight:    { en: 'Average Weight', si: 'සාමාන්‍ය බර',    ta: 'சராசரி எடை' },
-    avgHeight:    { en: 'Average Height', si: 'සාමාන්‍ය උස',     ta: 'சராசரி உயரம்' },
-    maleWeight:   { en: 'Male Weight',    si: 'පිරිමි බර',       ta: 'ஆண் எடை' },
-    femaleWeight: { en: 'Female Weight',  si: 'ගෙනෙ  බර',       ta: 'பெண் எடை' },
-    maleHeight:   { en: 'Male Height',    si: 'පිරිමි උස',        ta: 'ஆண் உயரம்' },
-    femaleHeight: { en: 'Female Height',  si: 'ගෙනෙ  උස',        ta: 'பெண் உயரம்' },
+    avgWeight:    { en: 'Average Weight',          si: 'සාමාන්‍ය බර',       ta: 'சராசரி எடை' },
+    avgHeight:    { en: 'Average Height / Length', si: 'සාමාන්‍ය උස / දිග',  ta: 'சராசரி உயரம் / நீளம்' },
+    maleWeight:   { en: 'Male Weight',             si: 'පිරිමි බර',          ta: 'ஆண் எடை' },
+    femaleWeight: { en: 'Female Weight',           si: 'ගැහැණු බර',          ta: 'பெண் எடை' },
+    maleHeight:   { en: 'Male Height / Length',    si: 'පිරිමි උස / දිග',    ta: 'ஆண் உயரம் / நீளம்' },
+    femaleHeight: { en: 'Female Height / Length',  si: 'ගැහැණු උස / දිග',    ta: 'பெண் உயரம் / நீளம்' },
     weightHint:   { en: 'e.g. 180–220 kg', si: 'උදා: 180–220 kg', ta: 'எ.கா: 180–220 kg' },
     heightHint:   { en: 'e.g. 1.1–1.3 m',  si: 'උදා: 1.1–1.3 m',  ta: 'எ.கா: 1.1–1.3 m' },
     birthArea:    { en: 'Birth / Habitat Area', si: 'ඉපදීම / ජීවන ප්‍රදේශය', ta: 'பிறப்பு / வாசஸ்தல பகுதி' },

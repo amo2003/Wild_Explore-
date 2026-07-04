@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 
 const CONTACT_INFO = [
-  { icon: '📧', label: 'Email', value: 'hello@wildexplore.app', href: 'mailto:hello@wildexplore.app' },
+  { icon: '📧', label: 'Email', value: 'amodindupa@gmail.com', href: 'mailto:amodindupa@gmail.com' },
   { icon: '🐙', label: 'GitHub', value: 'github.com/amo2003/Wild_Explore-', href: 'https://github.com/amo2003/Wild_Explore-' },
   { icon: '🌍', label: 'Website', value: 'wild-explore.vercel.app', href: 'https://wild-explore.vercel.app' },
 ]
@@ -29,7 +29,7 @@ export default function Contact() {
     // Opens default email client with pre-filled data
     const subject = encodeURIComponent(`[WildExplore] ${form.topic || 'Contact'} — ${form.name}`)
     const body = encodeURIComponent(`Name: ${form.name}\nEmail: ${form.email}\nTopic: ${form.topic}\n\nMessage:\n${form.message}`)
-    window.location.href = `mailto:hello@wildexplore.app?subject=${subject}&body=${body}`
+    window.location.href = `mailto:amodindupa@gmail.com?subject=${subject}&body=${body}`
     setSent(true)
   }
 
