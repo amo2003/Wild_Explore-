@@ -13,6 +13,9 @@ export default function Navbar() {
     { to: '/',        label: tr(t.nav.home) },
     { to: '/animals', label: tr(t.nav.animals) },
     { to: '/add',     label: tr(t.nav.addAnimal) },
+    { to: '/contact',     label: tr(t.nav.Contact) },
+    { to: '/about',     label: tr(t.nav.About) },
+
   ]
 
   const currentLang = LANGUAGES.find(l => l.code === lang)

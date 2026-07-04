@@ -1,3 +1,6 @@
+import About from "../pages/About"
+import Contact from "../pages/Contact"
+
 export const LANGUAGES = [
   { code: 'en', label: 'English', flag: '🇬🇧', nativeLabel: 'English' },
   { code: 'si', label: 'Sinhala', flag: '🇱🇰', nativeLabel: 'සිංහල' },
@@ -10,6 +13,9 @@ export const t = {
     home:      { en: 'Home',       si: 'මුල් පිටුව',  ta: 'முகப்பு' },
     animals:   { en: 'Animals',    si: 'සතුන්',        ta: 'விலங்குகள்' },
     addAnimal: { en: '+ Add Animal', si: '+ සතෙකු එකතු කරන්න', ta: '+ விலங்கு சேர்க்க' },
+    Contact: { en: 'Contact Us', si: 'අපව අමතන්න', ta: 'எங்களைத் தொடர்பு கொள்ளுங்கள்' },
+    About: { en: 'About Us', si: 'අපි ගැන', ta: 'எங்களைப் பற்றி' },
+
   },
 
   // ── Home ────────────────────────────────────────────
