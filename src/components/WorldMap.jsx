@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { feature } from 'topojson-client'
 
-// ── Continent colours by ISO numeric country id ─────────────────────────────
+// ── Continent colours ────────────────────────────────────────────────────────
 const AFRICA   = new Set([12,24,72,108,120,132,140,148,174,175,180,204,231,232,262,266,270,288,324,384,404,426,430,434,450,454,466,478,504,508,516,562,566,646,678,686,694,706,710,716,728,736,748,768,788,800,818,834,854,894])
 const AMERICAS = new Set([28,32,44,52,68,76,84,124,152,170,188,192,212,214,218,222,238,254,304,308,320,328,332,340,388,474,484,500,530,531,533,534,535,558,591,600,604,630,659,662,663,670,740,780,796,840,850,858,862])
 const ASIA     = new Set([4,50,64,96,104,116,144,156,158,162,356,360,364,368,376,392,400,408,410,414,418,422,446,458,462,496,512,524,586,608,634,682,702,704,760,764,784,792,860,887])
@@ -26,18 +27,14 @@ const LEGEND = [
   { color: '#a3e635', label: 'Oceania' },
 ]
 
-// ── Mercator projection (matches topojson rendering) ─────────────────────────
+// ── Mercator projection ──────────────────────────────────────────────────────
 const VW = 960, VH = 500
-
-function mX(lon) {
-  return ((lon + 180) / 360) * VW
-}
+function mX(lon) { return ((lon + 180) / 360) * VW }
 function mY(lat) {
   const phi = (lat * Math.PI) / 180
   return (VH / 2) - (VW / (2 * Math.PI)) * Math.log(Math.tan(Math.PI / 4 + phi / 2))
 }
 
-// GeoJSON feature → SVG path string
 function toSVGPath(geom) {
   if (!geom) return ''
   const ringToD = ring =>
@@ -49,55 +46,78 @@ function toSVGPath(geom) {
   return ''
 }
 
+// Spread pins that share the same pixel location so all are visible
+function spreadPins(animals, zoom) {
+  const R = 32 / zoom  // spread radius scales with zoom
+  const groups = {}
+  animals.forEach(a => {
+    const key = `${Math.round(mX(a.lng))}_${Math.round(mY(a.lat))}`
+    if (!groups[key]) groups[key] = []
+    groups[key].push(a)
+  })
+  return animals.map(a => {
+    const key = `${Math.round(mX(a.lng))}_${Math.round(mY(a.lat))}`
+    const group = groups[key]
+    const idx = group.indexOf(a)
+    const total = group.length
+    let offsetX = 0, offsetY = 0
+    if (total > 1) {
+      const angle = (2 * Math.PI * idx) / total
+      offsetX = Math.cos(angle) * R
+      offsetY = Math.sin(angle) * R
+    }
+    return { ...a, pinX: mX(a.lng) + offsetX, pinY: mY(a.lat) + offsetY }
+  })
+}
+
 export default function WorldMap({ animals }) {
   const [paths, setPaths]   = useState([])
   const [hovered, setHovered] = useState(null)
-
-  // Viewport: pan (tx, ty) and zoom stored as a CSS matrix
-  const [view, setView] = useState({ tx: 0, ty: 0, scale: 1 })
+  const [view, setView]     = useState({ tx: 0, ty: 0, scale: 1 })
+  const navigate = useNavigate()
   const dragging = useRef(false)
   const last     = useRef({ x: 0, y: 0 })
+  const moved    = useRef(false)   // track if drag happened (to distinguish click)
   const svgRef   = useRef(null)
 
-  // Load bundled local TopoJSON
   useEffect(() => {
     fetch('/countries-110m.json')
       .then(r => r.json())
       .then(topo => {
         const countries = feature(topo, topo.objects.countries)
-        setPaths(
-          countries.features
-            .map(f => ({ d: toSVGPath(f.geometry), ...countryColor(f.id) }))
-            .filter(p => p.d)
-        )
+        setPaths(countries.features
+          .map(f => ({ d: toSVGPath(f.geometry), ...countryColor(f.id) }))
+          .filter(p => p.d))
       })
   }, [])
 
-  // Only show animals with real lng/lat
   const pins = animals.filter(a => a.lng != null && a.lat != null)
+  const spreadPinList = spreadPins(pins, view.scale)
 
-  // ── Wheel zoom (zoom toward cursor) ────────────────────────────────────────
+  // ── Wheel zoom ─────────────────────────────────────────────────────────────
   function onWheel(e) {
     e.preventDefault()
     const rect = svgRef.current.getBoundingClientRect()
-    const mx = e.clientX - rect.left   // cursor in element coords
+    const mx = e.clientX - rect.left
     const my = e.clientY - rect.top
     const factor = e.deltaY < 0 ? 1.15 : 0.87
     setView(v => {
       const ns = Math.min(10, Math.max(0.8, v.scale * factor))
-      // Adjust pan so the point under the cursor stays fixed
-      const tx = mx - (mx - v.tx) * (ns / v.scale)
-      const ty = my - (my - v.ty) * (ns / v.scale)
-      return { tx, ty, scale: ns }
+      return {
+        tx: mx - (mx - v.tx) * (ns / v.scale),
+        ty: my - (my - v.ty) * (ns / v.scale),
+        scale: ns,
+      }
     })
   }
 
   // ── Drag pan ───────────────────────────────────────────────────────────────
-  const onMouseDown = e => { dragging.current = true; last.current = { x: e.clientX, y: e.clientY } }
+  const onMouseDown = e => { dragging.current = true; moved.current = false; last.current = { x: e.clientX, y: e.clientY } }
   const onMouseMove = e => {
     if (!dragging.current) return
     const dx = e.clientX - last.current.x
     const dy = e.clientY - last.current.y
+    if (Math.abs(dx) + Math.abs(dy) > 3) moved.current = true
     last.current = { x: e.clientX, y: e.clientY }
     setView(v => ({ ...v, tx: v.tx + dx, ty: v.ty + dy }))
   }
@@ -105,19 +125,19 @@ export default function WorldMap({ animals }) {
 
   const onTouchStart = e => {
     if (e.touches.length !== 1) return
-    dragging.current = true
+    dragging.current = true; moved.current = false
     last.current = { x: e.touches[0].clientX, y: e.touches[0].clientY }
   }
   const onTouchMove = e => {
     if (!dragging.current || e.touches.length !== 1) return
     const dx = e.touches[0].clientX - last.current.x
     const dy = e.touches[0].clientY - last.current.y
+    if (Math.abs(dx) + Math.abs(dy) > 3) moved.current = true
     last.current = { x: e.touches[0].clientX, y: e.touches[0].clientY }
     setView(v => ({ ...v, tx: v.tx + dx, ty: v.ty + dy }))
   }
   const onTouchEnd = () => { dragging.current = false }
 
-  // SVG <g> transform: translate then scale, origin top-left
   const gTransform = `translate(${view.tx} ${view.ty}) scale(${view.scale})`
 
   return (
@@ -135,11 +155,10 @@ export default function WorldMap({ animals }) {
                       bg-gradient-to-b from-black/45 to-transparent pointer-events-none">
         <span className="text-white text-xs sm:text-sm font-bold drop-shadow">🌍 Wildlife Habitat Map</span>
         <span className="text-white/75 text-xs hidden sm:block drop-shadow">
-          Scroll to zoom · Drag to pan · Hover pins
+          Scroll to zoom · Drag to pan · Click pins
         </span>
       </div>
 
-      {/* Map SVG */}
       <svg
         ref={svgRef}
         viewBox={`0 0 ${VW} ${VH}`}
@@ -150,73 +169,67 @@ export default function WorldMap({ animals }) {
         onWheel={onWheel}
       >
         <defs>
-          {pins.map(a => (
-            <clipPath key={a.id} id={`wm-clip-${a.id}`}>
+          {spreadPinList.map(a => (
+            <clipPath key={a._id || a.id} id={`wm-clip-${a._id || a.id}`}>
               <circle cx="0" cy="0" r="12" />
             </clipPath>
           ))}
         </defs>
 
-        {/* Ocean base */}
         <rect x="-9999" y="-9999" width="29999" height="29999" fill="#7dd3fc" />
 
         <g transform={gTransform}>
-          {/* Countries */}
           {paths.map((p, i) => (
             <path key={i} d={p.d} fill={p.fill} stroke={p.stroke} strokeWidth={0.5} />
           ))}
 
           {paths.length === 0 && (
-            <text x={VW / 2} y={VH / 2} textAnchor="middle"
-              fill="white" fontSize={20} fontFamily="system-ui,sans-serif">
-              Loading map…
-            </text>
+            <text x={VW / 2} y={VH / 2} textAnchor="middle" fill="white" fontSize={20}>Loading map…</text>
           )}
 
-          {/* Animal pins */}
-          {pins.map(animal => {
-            const x = mX(animal.lng)
-            const y = mY(animal.lat)
+          {spreadPinList.map(animal => {
+            const { pinX, pinY } = animal
+            const animalId = String(animal._id || animal.id)
             const img = animal.images?.[0] || animal.image || ''
-            const isHov = hovered === animal.id
+            const isHov = hovered === animalId
             const R = 12
 
             return (
               <g
-                key={animal.id}
-                transform={`translate(${x.toFixed(1)},${y.toFixed(1)})`}
+                key={animalId}
+                transform={`translate(${pinX.toFixed(1)},${pinY.toFixed(1)})`}
                 style={{ cursor: 'pointer' }}
-                onMouseEnter={e => { e.stopPropagation(); setHovered(animal.id) }}
+                onMouseEnter={e => { e.stopPropagation(); setHovered(animalId) }}
                 onMouseLeave={e => { e.stopPropagation(); setHovered(null) }}
-                onClick={e => { e.stopPropagation(); window.location.assign(`/animals/${animal.id}`) }}
+                onMouseDown={e => e.stopPropagation()}
+                onMouseUp={e => {
+                  e.stopPropagation()
+                  // Only navigate if the map wasn't dragged
+                  if (!moved.current) navigate(`/animals/${animalId}`)
+                }}
+                onTouchEnd={e => {
+                  e.stopPropagation()
+                  if (!moved.current) navigate(`/animals/${animalId}`)
+                }}
               >
-                {/* Hover glow */}
                 {isHov && <circle r={R + 10} fill="#16a34a" opacity={0.25} />}
 
-                {/* White drop-shadow ring */}
                 <circle r={R + 3} fill="white"
                   style={{ filter: 'drop-shadow(0 3px 6px rgba(0,0,0,0.5))' }} />
-
-                {/* Coloured border */}
                 <circle r={R + 1.5} fill="none"
                   stroke={isHov ? '#15803d' : '#22c55e'}
                   strokeWidth={isHov ? 2.5 : 1.5} />
 
-                {/* Animal photo */}
                 {img
                   ? <image href={img} x={-R} y={-R} width={R * 2} height={R * 2}
-                      clipPath={`url(#wm-clip-${animal.id})`}
+                      clipPath={`url(#wm-clip-${animalId})`}
                       preserveAspectRatio="xMidYMid slice" />
-                  : <text textAnchor="middle" dominantBaseline="central"
-                      fontSize={R} fill="#15803d">🐾</text>
+                  : <text textAnchor="middle" dominantBaseline="central" fontSize={R} fill="#15803d">🐾</text>
                 }
 
-                {/* Pin stem */}
-                <line x1="0" y1={R + 3} x2="0" y2={R + 10}
-                  stroke="#15803d" strokeWidth="2" />
+                <line x1="0" y1={R + 3} x2="0" y2={R + 10} stroke="#15803d" strokeWidth="2" />
                 <circle cx="0" cy={R + 11} r="2.5" fill="#15803d" />
 
-                {/* Tooltip */}
                 {isHov && (
                   <g>
                     <rect x="-48" y={-R - 38} width="96" height="30" rx="7"
@@ -254,7 +267,6 @@ export default function WorldMap({ animals }) {
         ))}
       </div>
 
-      {/* Zoom hint */}
       <div className="absolute bottom-2 right-2 z-10 hidden sm:block bg-white/85 backdrop-blur-sm
                       rounded-full px-2.5 py-1 text-xs text-gray-500 pointer-events-none shadow">
         🔍 Scroll to zoom
