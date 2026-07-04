@@ -7,6 +7,8 @@ import Animals from './pages/Animals'
 import AnimalDetail from './pages/AnimalDetail'
 import AddAnimal from './pages/AddAnimal'
 import EditAnimal from './pages/EditAnimal'
+import About from './pages/About'
+import Contact from './pages/Contact'
 import './App.css'
 
 export default function App() {
@@ -21,6 +23,8 @@ export default function App() {
             <Route path="/animals/:id" element={<AnimalDetail />} />
             <Route path="/animals/:id/edit" element={<EditAnimal />} />
             <Route path="/add" element={<AddAnimal />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/contact" element={<Contact />} />
           </Routes>
         </AnimalProvider>
       </LanguageProvider>

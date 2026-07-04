@@ -12,7 +12,9 @@ export default function Navbar() {
   const links = [
     { to: '/',        label: tr(t.nav.home) },
     { to: '/animals', label: tr(t.nav.animals) },
-    { to: '/add',     label: tr(t.nav.addAnimal) },
+    { to: '/about',   label: 'About' },
+    { to: '/contact', label: 'Contact' },
+    ...(!readonly ? [{ to: '/add', label: tr(t.nav.addAnimal) }] : []),
   ]
 
   const currentLang = LANGUAGES.find(l => l.code === lang)
