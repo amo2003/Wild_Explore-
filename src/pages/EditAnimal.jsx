@@ -33,7 +33,7 @@ export default function EditAnimal() {
   const { animals, updateAnimal, deleteAnimal } = useAnimals()
   const navigate = useNavigate()
   const { tr, t } = useLang()
-  const animal = animals.find(a => String(a.id) === id)
+  const animal = animals.map(a => ({ ...a, id: String(a._id || a.id) })).find(a => a.id === id)
   const [form, setForm] = useState(null)
   const [errors, setErrors] = useState({})
   const [saved, setSaved] = useState(false)
