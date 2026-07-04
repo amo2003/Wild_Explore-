@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom'
 import { useAnimals } from '../context/AnimalContext'
 import { CATEGORIES, STATUS_COLORS } from '../data/animals'
 import { useLang } from '../context/LanguageContext'
+import { useReadonly } from '../hooks/useReadonly'
 
 function InfoRow({ icon, label, value }) {
   if (!value) return null
@@ -76,6 +77,7 @@ export default function AnimalDetail() {
   const { id } = useParams()
   const { animals, loading } = useAnimals()
   const { tr, t } = useLang()
+  const readonly = useReadonly()
   const animal = animals.map(a => ({ ...a, id: String(a._id || a.id) })).find(a => a.id === id)
 
   if (loading) {
@@ -300,14 +302,18 @@ export default function AnimalDetail() {
                 className="text-center inline-flex items-center justify-center gap-2 bg-green-700 hover:bg-green-800 text-white font-semibold px-5 py-3 rounded-xl transition-all text-sm">
                 {tr(t.detail.backAnimals)}
               </Link>
-              <Link to={`/animals/${animal.id}/edit`}
-                className="text-center inline-flex items-center justify-center gap-2 bg-green-100 hover:bg-green-200 text-green-800 font-semibold px-5 py-3 rounded-xl transition-all text-sm">
-                {tr(t.detail.editAnimal)}
-              </Link>
-              <Link to="/add"
-                className="text-center inline-flex items-center justify-center gap-2 border border-green-700 text-green-700 hover:bg-green-50 font-semibold px-5 py-3 rounded-xl transition-all text-sm">
-                {tr(t.detail.addAnother)}
-              </Link>
+              {!readonly && (
+                <>
+                  <Link to={`/animals/${animal.id}/edit`}
+                    className="text-center inline-flex items-center justify-center gap-2 bg-green-100 hover:bg-green-200 text-green-800 font-semibold px-5 py-3 rounded-xl transition-all text-sm">
+                    {tr(t.detail.editAnimal)}
+                  </Link>
+                  <Link to="/add"
+                    className="text-center inline-flex items-center justify-center gap-2 border border-green-700 text-green-700 hover:bg-green-50 font-semibold px-5 py-3 rounded-xl transition-all text-sm">
+                    {tr(t.detail.addAnother)}
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         </div>

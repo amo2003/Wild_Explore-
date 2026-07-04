@@ -1,17 +1,19 @@
 import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { useLang } from '../context/LanguageContext'
+import { useReadonly } from '../hooks/useReadonly'
 
 export default function Navbar() {
   const { pathname } = useLocation()
   const [menuOpen, setMenuOpen] = useState(false)
   const [langOpen, setLangOpen] = useState(false)
   const { lang, setLang, tr, t, LANGUAGES } = useLang()
+  const readonly = useReadonly()
 
   const links = [
     { to: '/',        label: tr(t.nav.home) },
     { to: '/animals', label: tr(t.nav.animals) },
-    { to: '/add',     label: tr(t.nav.addAnimal) },
+    ...(!readonly ? [{ to: '/add', label: tr(t.nav.addAnimal) }] : []),
   ]
 
   const currentLang = LANGUAGES.find(l => l.code === lang)
