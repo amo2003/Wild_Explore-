@@ -163,10 +163,11 @@ export default function Home() {
               {tr(t.home.heroDesc)}
             </p>
             <div className="flex flex-wrap gap-3 sm:gap-4">
-              <Link to="/animals"
+              <button
+                onClick={() => document.getElementById('categories')?.scrollIntoView({ behavior: 'smooth' })}
                 className="text-center bg-green-400 hover:bg-green-300 text-green-950 font-bold px-7 sm:px-9 py-3.5 rounded-xl transition-all duration-200 shadow-xl hover:-translate-y-0.5 text-sm sm:text-base">
                 {tr(t.home.browseBtn)}
-              </Link>
+              </button>
             </div>
           </div>
         </div>
@@ -191,7 +192,7 @@ export default function Home() {
       </section>
 
       {/* Browse by Category */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16">
+      <section id="categories" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16">
         <div className="text-center mb-7 sm:mb-10">
           <h2 className="text-2xl sm:text-3xl font-extrabold text-green-900">{tr(t.home.browseTitle)}</h2>
           <p className="text-gray-500 mt-2 text-sm sm:text-base">{tr(t.home.browseSub)}</p>
@@ -243,6 +244,29 @@ export default function Home() {
                 </div>
               </Link>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Info note */}
+      <section className="py-10 sm:py-14">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="bg-gradient-to-r from-green-800 to-green-600 rounded-2xl sm:rounded-3xl p-8 sm:p-10 text-center text-white shadow-2xl relative overflow-hidden">
+            <div className="absolute inset-0 opacity-10 text-[120px] sm:text-[200px] leading-none flex items-center justify-center pointer-events-none select-none">🌿</div>
+            <div className="relative">
+              <h2 className="text-2xl sm:text-3xl font-extrabold mb-3">{tr(t.home.ctaTitle)}</h2>
+              <p className="text-green-200 text-sm sm:text-lg max-w-xl mx-auto leading-relaxed">
+                {tr(t.home.ctaDesc)}
+              </p>
+              <div className="mt-6 flex flex-wrap justify-center gap-4 text-sm text-green-100">
+                <span className="flex items-center gap-1.5 bg-white/10 px-4 py-2 rounded-full">🦁 {tr(t.categories.mammals)}</span>
+                <span className="flex items-center gap-1.5 bg-white/10 px-4 py-2 rounded-full">🦎 {tr(t.categories.reptiles)}</span>
+                <span className="flex items-center gap-1.5 bg-white/10 px-4 py-2 rounded-full">🦅 {tr(t.categories.birds)}</span>
+                <span className="flex items-center gap-1.5 bg-white/10 px-4 py-2 rounded-full">🐸 {tr(t.categories.amphibians)}</span>
+                <span className="flex items-center gap-1.5 bg-white/10 px-4 py-2 rounded-full">🐟 {tr(t.categories.fish)}</span>
+                <span className="flex items-center gap-1.5 bg-white/10 px-4 py-2 rounded-full">🦋 {tr(t.categories.insects)}</span>
+              </div>
+            </div>
           </div>
         </div>
       </section>
