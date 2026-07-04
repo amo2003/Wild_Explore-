@@ -50,6 +50,8 @@ export default function AddAnimal() {
   const [errors, setErrors] = useState({})
   const [submitted, setSubmitted] = useState(false)
   const [addedName, setAddedName] = useState('')
+  const [saving, setSaving] = useState(false)
+  const [saveError, setSaveError] = useState('')
 
   function handleChange(e) {
     const { name, value } = e.target
@@ -72,7 +74,7 @@ export default function AddAnimal() {
     return errs
   }
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault()
     const errs = validate()
     if (Object.keys(errs).length) {
@@ -80,17 +82,24 @@ export default function AddAnimal() {
       document.querySelector('[data-error="true"]')?.scrollIntoView({ behavior: 'smooth', block: 'center' })
       return
     }
-    const cleanImages = form.images.filter(u => u.trim())
-    addAnimal({
-      ...form,
-      images: cleanImages,
-      image: cleanImages[0] || '',
-      // keep averageWeight/Height as fallback for cards
-      averageWeight: form.maleWeight || form.femaleWeight || '',
-      averageHeight: form.maleHeight || form.femaleHeight || '',
-    })
-    setAddedName(form.name)
-    setSubmitted(true)
+    setSaving(true)
+    setSaveError('')
+    try {
+      const cleanImages = form.images.filter(u => u.trim())
+      await addAnimal({
+        ...form,
+        images: cleanImages,
+        image: cleanImages[0] || '',
+        averageWeight: form.maleWeight || form.femaleWeight || '',
+        averageHeight: form.maleHeight || form.femaleHeight || '',
+      })
+      setAddedName(form.name)
+      setSubmitted(true)
+    } catch (err) {
+      setSaveError(err.message || 'Failed to save. Check your connection.')
+    } finally {
+      setSaving(false)
+    }
   }
 
   function handleReset() {
@@ -310,9 +319,22 @@ export default function AddAnimal() {
           </div>
 
           <div className="flex flex-col sm:flex-row gap-3">
-            <button type="submit"
-              className="flex-1 bg-green-700 hover:bg-green-800 active:bg-green-900 text-white font-bold py-3.5 rounded-xl transition-all shadow-md text-sm sm:text-base">
-              {tr(t.form.submitAdd)}
+            {saveError && (
+              <div className="sm:col-span-2 w-full bg-red-50 border border-red-300 text-red-700 text-sm rounded-xl px-4 py-3">
+                ❌ {saveError}
+              </div>
+            )}
+            <button type="submit" disabled={saving}
+              className="flex-1 bg-green-700 hover:bg-green-800 active:bg-green-900 disabled:opacity-60 text-white font-bold py-3.5 rounded-xl transition-all shadow-md text-sm sm:text-base flex items-center justify-center gap-2">
+              {saving ? (
+                <>
+                  <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+                  </svg>
+                  Saving…
+                </>
+              ) : tr(t.form.submitAdd)}
             </button>
             <button type="button" onClick={handleReset}
               className="sm:w-32 border border-gray-300 text-gray-600 hover:bg-gray-50 font-semibold py-3.5 rounded-xl transition-all text-sm">
