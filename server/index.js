@@ -19,6 +19,17 @@ app.use('/api/animals', animalRoutes)
 
 app.get('/api/health', (_, res) => res.json({ status: 'ok' }))
 
+// Root — friendly message so "/" doesn't show "Cannot GET /"
+app.get('/', (_, res) => res.json({
+  app: 'WildExplore API',
+  version: '1.0.0',
+  status: 'running',
+  endpoints: {
+    health:  '/api/health',
+    animals: '/api/animals',
+  }
+}))
+
 // ── DB + Start ───────────────────────────────────────────
 mongoose
   .connect(process.env.MONGODB_URI)
