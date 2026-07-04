@@ -9,8 +9,25 @@ const PORT = process.env.PORT || 5000
 
 // ── Middleware ───────────────────────────────────────────
 app.use(cors({
-  origin: process.env.CLIENT_ORIGIN || 'http://localhost:5173',
+  origin: function(origin, callback) {
+    // Allow requests with no origin (mobile apps, curl, Postman)
+    if (!origin) return callback(null, true)
+    const allowed = (process.env.CLIENT_ORIGIN || '').split(',').map(s => s.trim())
+    // Also allow all vercel.app and railway.app domains during development
+    if (
+      allowed.includes(origin) ||
+      allowed.includes('*') ||
+      origin.endsWith('.vercel.app') ||
+      origin.endsWith('.railway.app') ||
+      origin === 'http://localhost:5173' ||
+      origin === 'http://localhost:4173'
+    ) {
+      return callback(null, true)
+    }
+    callback(new Error(`CORS blocked: ${origin}`))
+  },
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true,
 }))
 app.use(express.json())
 
