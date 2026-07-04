@@ -8,12 +8,11 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [langOpen, setLangOpen] = useState(false)
   const { lang, setLang, tr, t, LANGUAGES } = useLang()
-  const readonly = useReadonly()
 
   const links = [
     { to: '/',        label: tr(t.nav.home) },
     { to: '/animals', label: tr(t.nav.animals) },
-    ...(!readonly ? [{ to: '/add', label: tr(t.nav.addAnimal) }] : []),
+    { to: '/add',     label: tr(t.nav.addAnimal) },
   ]
 
   const currentLang = LANGUAGES.find(l => l.code === lang)

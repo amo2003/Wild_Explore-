@@ -135,7 +135,6 @@ function StatCard({ icon, value, label }) {
 export default function Home() {
   const { animals } = useAnimals()
   const { tr, t } = useLang()
-  const readonly = useReadonly()
 
   const categoryCounts = CATEGORIES.map(cat => ({
     ...cat,
@@ -169,12 +168,10 @@ export default function Home() {
                 className="text-center bg-green-400 hover:bg-green-300 text-green-950 font-bold px-7 sm:px-9 py-3.5 rounded-xl transition-all duration-200 shadow-xl hover:-translate-y-0.5 text-sm sm:text-base">
                 {tr(t.home.browseBtn)}
               </Link>
-              {!readonly && (
-                <Link to="/add"
-                  className="text-center bg-white/15 hover:bg-white/25 border border-white/40 backdrop-blur-sm text-white font-semibold px-7 sm:px-9 py-3.5 rounded-xl transition-all duration-200 text-sm sm:text-base">
-                  {tr(t.home.addBtn)}
-                </Link>
-              )}
+              <Link to="/add"
+                className="text-center bg-white/15 hover:bg-white/25 border border-white/40 backdrop-blur-sm text-white font-semibold px-7 sm:px-9 py-3.5 rounded-xl transition-all duration-200 text-sm sm:text-base">
+                {tr(t.home.addBtn)}
+              </Link>
             </div>
           </div>
         </div>
@@ -255,24 +252,22 @@ export default function Home() {
         </div>
       </section>
 
-      {/* CTA — hidden in readonly/public mode */}
-      {!readonly && (
-        <section className="py-10 sm:py-16">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="bg-gradient-to-r from-green-800 to-green-600 rounded-2xl sm:rounded-3xl p-8 sm:p-10 text-center text-white shadow-2xl relative overflow-hidden">
-              <div className="absolute inset-0 opacity-10 text-[120px] sm:text-[200px] leading-none flex items-center justify-center pointer-events-none select-none">🌿</div>
-              <div className="relative">
-                <h2 className="text-2xl sm:text-3xl font-extrabold mb-2 sm:mb-3">{tr(t.home.ctaTitle)}</h2>
-                <p className="text-green-200 text-sm sm:text-lg mb-6 sm:mb-8 max-w-lg mx-auto">{tr(t.home.ctaDesc)}</p>
-                <Link to="/add"
-                  className="inline-block bg-white text-green-800 font-bold px-8 sm:px-10 py-3 rounded-xl hover:bg-green-50 transition-all shadow-lg hover:-translate-y-0.5">
-                  {tr(t.home.ctaBtn)}
-                </Link>
-              </div>
+      {/* CTA */}
+      <section className="py-10 sm:py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="bg-gradient-to-r from-green-800 to-green-600 rounded-2xl sm:rounded-3xl p-8 sm:p-10 text-center text-white shadow-2xl relative overflow-hidden">
+            <div className="absolute inset-0 opacity-10 text-[120px] sm:text-[200px] leading-none flex items-center justify-center pointer-events-none select-none">🌿</div>
+            <div className="relative">
+              <h2 className="text-2xl sm:text-3xl font-extrabold mb-2 sm:mb-3">{tr(t.home.ctaTitle)}</h2>
+              <p className="text-green-200 text-sm sm:text-lg mb-6 sm:mb-8 max-w-lg mx-auto">{tr(t.home.ctaDesc)}</p>
+              <Link to="/add"
+                className="inline-block bg-white text-green-800 font-bold px-8 sm:px-10 py-3 rounded-xl hover:bg-green-50 transition-all shadow-lg hover:-translate-y-0.5">
+                {tr(t.home.ctaBtn)}
+              </Link>
             </div>
           </div>
-        </section>
-      )}
+        </div>
+      </section>
 
       <footer className="bg-green-950 text-green-400 text-center py-5 sm:py-6 text-xs sm:text-sm px-4">
         <p>{tr(t.home.footerText)}</p>
