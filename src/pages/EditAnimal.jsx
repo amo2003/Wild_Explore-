@@ -72,6 +72,8 @@ export default function EditAnimal() {
       birthArea:          animal.birthArea          || '',
       food:               animal.food               || '',
       description:        animal.description        || '',
+      descriptionSi:      animal.descriptionSi      || '',
+      descriptionTa:      animal.descriptionTa      || '',
       images: animal.images?.length
         ? [...animal.images, '', ''].slice(0, 3)
         : [animal.image || '', '', ''],
@@ -289,8 +291,32 @@ export default function EditAnimal() {
           {/* ── 5 Description ── */}
           <div className="bg-white rounded-2xl shadow-sm border border-green-100 p-5 sm:p-7">
             <SectionHeader title={tr(t.form.sec5)} />
-            <textarea name="description" value={form.description} onChange={handleChange} rows={4}
-              className={`${inputClass} resize-none`} placeholder="..." />
+            <div className="flex flex-col gap-5">
+              <div>
+                <label className="text-xs sm:text-sm font-semibold text-green-900 mb-1 block">
+                  🇬🇧 Description <span className="text-gray-400 font-normal text-xs">(English)</span>
+                </label>
+                <textarea name="description" value={form.description} onChange={handleChange} rows={4}
+                  placeholder="Describe the animal in English..."
+                  className={`${inputClass} resize-none`} />
+              </div>
+              <div>
+                <label className="text-xs sm:text-sm font-semibold text-green-900 mb-1 block">
+                  🇱🇰 විස්තරය <span className="text-gray-400 font-normal text-xs">(සිංහල)</span>
+                </label>
+                <textarea name="descriptionSi" value={form.descriptionSi} onChange={handleChange} rows={4}
+                  placeholder="සිංහල විස්තරය මෙහි ලියන්න..."
+                  className={`${inputClass} resize-none`} lang="si" />
+              </div>
+              <div>
+                <label className="text-xs sm:text-sm font-semibold text-green-900 mb-1 block">
+                  🇱🇰 விளக்கம் <span className="text-gray-400 font-normal text-xs">(தமிழ்)</span>
+                </label>
+                <textarea name="descriptionTa" value={form.descriptionTa} onChange={handleChange} rows={4}
+                  placeholder="தமிழ் விளக்கத்தை இங்கே எழுதுங்கள்..."
+                  className={`${inputClass} resize-none`} lang="ta" />
+              </div>
+            </div>
           </div>
 
           {/* ── Actions ── */}

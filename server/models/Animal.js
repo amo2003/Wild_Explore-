@@ -26,7 +26,9 @@ const animalSchema = new mongoose.Schema(
 
     birthArea: { type: String, required: true },
     food:      { type: String, required: true },
-    description: { type: String, default: '' },
+    description:   { type: String, default: '' },
+    descriptionSi: { type: String, default: '' },
+    descriptionTa: { type: String, default: '' },
 
     // Images
     images: [{ type: String }],

@@ -162,7 +162,7 @@ function ImageGallery({ images, name }) {
 export default function AnimalDetail() {
   const { id } = useParams()
   const { animals, loading } = useAnimals()
-  const { tr, t } = useLang()
+  const { tr, t, lang } = useLang()
   const animal = animals.map(a => ({ ...a, id: String(a._id || a.id) })).find(a => a.id === id)
 
   if (loading) {
@@ -193,6 +193,13 @@ export default function AnimalDetail() {
     ? (animal.images || []).filter(Boolean)
     : animal.image ? [animal.image] : []
   const hasTaxonomy = animal.className || animal.order || animal.suborder || animal.family || animal.subfamily
+
+  // Pick description for current language, fall back to English
+  const description = (lang === 'si' && animal.descriptionSi)
+    ? animal.descriptionSi
+    : (lang === 'ta' && animal.descriptionTa)
+    ? animal.descriptionTa
+    : animal.description || ''
 
   const translatedCat    = tr(t.categories[animal.category]) || category?.label
   const translatedStatus = tr(t.conservation[animal.conservationStatus]) || animal.conservationStatus
@@ -269,12 +276,12 @@ export default function AnimalDetail() {
 
               {/* Left: About + stats + taxonomy */}
               <div className="lg:col-span-2 order-2 lg:order-1 flex flex-col gap-7">
-                {animal.description && (
+                {description && (
                   <div>
                     <h2 className="text-base sm:text-lg font-bold text-green-900 mb-3 flex items-center gap-2">
                       <span>📖</span> {tr(t.detail.about)}
                     </h2>
-                    <p className="text-gray-600 leading-relaxed text-sm sm:text-base">{animal.description}</p>
+                    <p className="text-gray-600 leading-relaxed text-sm sm:text-base">{description}</p>
                   </div>
                 )}
 

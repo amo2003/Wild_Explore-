@@ -16,7 +16,7 @@ const EMPTY_FORM = {
   maleWeight: '', femaleWeight: '', maleHeight: '', femaleHeight: '',
   averageWeight: '', averageHeight: '',
   birthArea: '', food: '',
-  description: '', images: ['', '', ''],
+  description: '', descriptionSi: '', descriptionTa: '', images: ['', '', ''],
 }
 
 const inputClass = 'w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent bg-white text-gray-800 transition-all text-sm'
@@ -310,13 +310,34 @@ export default function AddAnimal() {
             </div>
           </div>
 
-          {/* 5 – Description */}
+          {/* 5 – Description (3 languages) */}
           <div className="bg-white rounded-2xl shadow-sm border border-green-100 p-5 sm:p-7">
             <SectionHeader num="5" title={tr(t.form.sec5)} />
-            <Field label={tr(t.form.descLabel)} hint={tr(t.form.descHint)}>
-              <textarea name="description" value={form.description} onChange={handleChange} rows={4}
-                placeholder="..." className={`${inputClass} resize-none`} />
-            </Field>
+            <div className="flex flex-col gap-5">
+              {/* English */}
+              <Field label={<span>🇬🇧 Description <span className="text-gray-400 font-normal text-xs">(English)</span></span>}
+                hint="Behavior, unique traits, interesting facts">
+                <textarea name="description" value={form.description} onChange={handleChange} rows={4}
+                  placeholder="Describe the animal in English..."
+                  className={`${inputClass} resize-none`} />
+              </Field>
+              {/* Sinhala */}
+              <Field label={<span>🇱🇰 විස්තරය <span className="text-gray-400 font-normal text-xs">(සිංහල)</span></span>}
+                hint="සිංහල භාෂාවෙන් විස්තර කරන්න">
+                <textarea name="descriptionSi" value={form.descriptionSi} onChange={handleChange} rows={4}
+                  placeholder="සිංහල විස්තරය මෙහි ලියන්න..."
+                  className={`${inputClass} resize-none`}
+                  lang="si" />
+              </Field>
+              {/* Tamil */}
+              <Field label={<span>🇱🇰 விளக்கம் <span className="text-gray-400 font-normal text-xs">(தமிழ்)</span></span>}
+                hint="தமிழ் மொழியில் விளக்கவும்">
+                <textarea name="descriptionTa" value={form.descriptionTa} onChange={handleChange} rows={4}
+                  placeholder="தமிழ் விளக்கத்தை இங்கே எழுதுங்கள்..."
+                  className={`${inputClass} resize-none`}
+                  lang="ta" />
+              </Field>
+            </div>
           </div>
 
           <div className="flex flex-col sm:flex-row gap-3">
