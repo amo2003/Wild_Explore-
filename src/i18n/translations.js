@@ -166,8 +166,8 @@ export const t = {
     confirmNo:    { en: 'Cancel',          si: 'අවලංගු',             ta: 'ரத்து' },
     originLabel:  { en: 'Origin Type',     si: 'සම්භව වර්ගය',        ta: 'தோற்ற வகை' },
     selectOrigin: { en: 'Select origin',   si: 'සම්භවය තෝරන්න',     ta: 'தோற்றத்தை தேர்ந்தெடுக்கவும்' },
-    ekadeshiya:   { en: 'Ekadeshiya — Endemic to Sri Lanka',         si: 'ඒකදේශීය — ලංකාවට ආවේණික',          ta: 'ஏகதேசிய — இலங்கைக்கு உரியது' },
-    videshiya:    { en: 'Videshiya — Found in Sri Lanka & worldwide', si: 'විදේශීය — ලංකාවේ හා ලෝකේ අනිත් රටවලත්', ta: 'விதேசிய — இலங்கை மற்றும் உலகில்' },
+    ekadeshiya:   { en: 'Ekadeshiya (Native/Endemic)',  si: 'ඒකදේශීය (දේශීය / ආවේණික)', ta: 'ஏகதேசிய (உள்ளூர் / ஆவேணிக)' },
+    videshiya:    { en: 'Videshiya (Exotic/Foreign)',   si: 'විදේශීය (ආගන්තුක / විදේශ)',  ta: 'விதேசிய (வெளிநாட்டு)' },
   },
 
   // ── Category labels ──────────────────────────────────
@@ -199,18 +199,10 @@ export const t = {
 
   // ── Origin ───────────────────────────────────────────
   origin: {
-    ekadeshiya: {
-      en: 'Ekadeshiya (Endemic to Sri Lanka)',
-      si: 'ඒකදේශීය (ලංකාවට ආවේණික)',
-      ta: 'ஏகதேசிய (இலங்கைக்கு உரிய)'
-    },
-    videshiya: {
-      en: 'Videshiya (Found in Sri Lanka & worldwide)',
-      si: 'විදේශීය (ලංකාවේ හා ලෝකේ අනිත් රටවලත්)',
-      ta: 'விதேசிய (இலங்கை மற்றும் உலகில் காணப்படுவது)'
-    },
+    ekadeshiya: { en: 'Ekadeshiya (Native)',  si: 'ඒකදේශීය (දේශීය)',   ta: 'ஏகதேசிய (உள்ளூர்)' },
+    videshiya:  { en: 'Videshiya (Exotic)',   si: 'විදේශීය (ආගන්තුක)', ta: 'விதேசிய (வெளிநாட்டு)' },
   },
-  originLabel: { en: 'Origin Type', si: 'සම්භව වර්ගය', ta: 'தோற்ற வகை' },
+  originLabel: { en: 'Origin', si: 'සම්භවය', ta: 'தோற்றம்' },
   originAll:   { en: 'All Origins', si: 'සියලු සම්භව', ta: 'அனைத்து தோற்றங்கள்' },
   originHint:  { en: 'Ekadeshiya = native/endemic · Videshiya = exotic/foreign',
                  si: 'ඒකදේශීය = දේශීය/ආවේණික · විදේශීය = ආගන්තුක',

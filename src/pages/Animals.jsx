@@ -97,9 +97,9 @@ export default function Animals() {
             {/* Origin filter */}
             <div className="flex gap-2 mb-6 sm:mb-8 flex-wrap">
               {[
-                { key: 'all',        label: tr(t.originAll),                icon: '🌐' },
-                { key: 'ekadeshiya', label: '🏡 Ekadeshiya (Endemic)',        icon: null },
-                { key: 'videshiya',  label: '✈️ Videshiya (Widespread)',       icon: null },
+                { key: 'all',        label: tr(t.originAll),         icon: '🌐' },
+                { key: 'ekadeshiya', label: tr(t.origin.ekadeshiya), icon: '🏡' },
+                { key: 'videshiya',  label: tr(t.origin.videshiya),  icon: '✈️' },
               ].map(({ key, label, icon }) => (
                 <button key={key} onClick={() => setOrigin(key)}
                   className={`flex-shrink-0 flex items-center gap-1.5 px-3 sm:px-4 py-2 rounded-full text-xs sm:text-sm font-medium transition-all whitespace-nowrap ${
@@ -168,7 +168,7 @@ function AnimalCard({ animal }) {
             <span className={`text-xs px-2 py-0.5 rounded-full font-semibold shadow-sm w-fit ${
               animal.origin === 'ekadeshiya' ? 'bg-emerald-100 text-emerald-700' : 'bg-blue-100 text-blue-700'
             }`}>
-              {animal.origin === 'ekadeshiya' ? '🏡 Endemic' : '✈️ Widespread'}
+              {animal.origin === 'ekadeshiya' ? '🏡' : '✈️'} {tr(t.origin[animal.origin])}
             </span>
           )}
         </div>
