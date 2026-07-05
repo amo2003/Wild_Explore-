@@ -97,20 +97,22 @@ export default function Animals() {
             {/* Origin filter */}
             <div className="flex gap-2 mb-6 sm:mb-8 flex-wrap">
               {[
-                { key: 'all',        label: tr(t.originAll),         icon: '🌐' },
-                { key: 'ekadeshiya', label: tr(t.origin.ekadeshiya), icon: '🏡' },
-                { key: 'videshiya',  label: tr(t.origin.videshiya),  icon: '✈️' },
-              ].map(({ key, label, icon }) => (
+                { key: 'all',     label: tr(t.originAll),          color: null },
+                { key: 'endemic', label: '🌿 Endemic to Sri Lanka', color: 'emerald' },
+                { key: 'native',  label: '🌍 Native to Sri Lanka',  color: 'teal' },
+                { key: 'exotic',  label: '✈️ Exotic / Introduced',   color: 'blue' },
+              ].map(({ key, label, color }) => (
                 <button key={key} onClick={() => setOrigin(key)}
                   className={`flex-shrink-0 flex items-center gap-1.5 px-3 sm:px-4 py-2 rounded-full text-xs sm:text-sm font-medium transition-all whitespace-nowrap ${
                     activeOrigin === key
-                      ? key === 'ekadeshiya' ? 'bg-emerald-600 text-white shadow-md'
-                        : key === 'videshiya' ? 'bg-blue-600 text-white shadow-md'
+                      ? color === 'emerald' ? 'bg-emerald-600 text-white shadow-md'
+                        : color === 'teal'  ? 'bg-teal-600 text-white shadow-md'
+                        : color === 'blue'  ? 'bg-blue-600 text-white shadow-md'
                         : 'bg-green-700 text-white shadow-md'
                       : 'bg-white text-gray-600 border border-gray-200 hover:border-green-400 hover:text-green-700'
                   }`}>
-                  <span>{icon}</span> {label}
-                  <span className="opacity-75">
+                  {label}
+                  <span className="opacity-75 ml-1">
                     ({key === 'all' ? list.length : list.filter(a => a.origin === key).length})
                   </span>
                 </button>
@@ -166,9 +168,13 @@ function AnimalCard({ animal }) {
           </span>
           {animal.origin && (
             <span className={`text-xs px-2 py-0.5 rounded-full font-semibold shadow-sm w-fit ${
-              animal.origin === 'ekadeshiya' ? 'bg-emerald-100 text-emerald-700' : 'bg-blue-100 text-blue-700'
+              animal.origin === 'endemic' ? 'bg-emerald-100 text-emerald-700'
+              : animal.origin === 'native' ? 'bg-teal-100 text-teal-700'
+              : 'bg-blue-100 text-blue-700'
             }`}>
-              {animal.origin === 'ekadeshiya' ? '🏡' : '✈️'} {tr(t.origin[animal.origin])}
+              {animal.origin === 'endemic' ? '🌿 Endemic'
+               : animal.origin === 'native' ? '🌍 Native'
+               : '✈️ Exotic'}
             </span>
           )}
         </div>

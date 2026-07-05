@@ -197,12 +197,13 @@ export default function AnimalDetail() {
   const translatedCat    = tr(t.categories[animal.category]) || category?.label
   const translatedStatus = tr(t.conservation[animal.conservationStatus]) || animal.conservationStatus
   const translatedOrigin = animal.origin ? tr(t.origin[animal.origin]) : null
-  const originIcon       = animal.origin === 'ekadeshiya' ? '🏡' : animal.origin === 'videshiya' ? '✈️' : null
-  const originBadgeClass = animal.origin === 'ekadeshiya'
-    ? 'bg-emerald-500 text-white'
-    : animal.origin === 'videshiya'
-    ? 'bg-blue-500 text-white'
-    : 'bg-gray-400 text-white'
+  const originIcon       = animal.origin === 'endemic' ? '🌿'
+                         : animal.origin === 'native'  ? '🌍'
+                         : animal.origin === 'exotic'  ? '✈️' : null
+  const originBadgeClass = animal.origin === 'endemic' ? 'bg-emerald-500 text-white'
+                         : animal.origin === 'native'  ? 'bg-teal-500 text-white'
+                         : animal.origin === 'exotic'  ? 'bg-blue-500 text-white'
+                         : 'bg-gray-400 text-white'
 
   return (
     <div className="min-h-screen bg-gray-50">

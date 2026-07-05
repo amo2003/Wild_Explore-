@@ -166,8 +166,9 @@ export const t = {
     confirmNo:    { en: 'Cancel',          si: 'අවලංගු',             ta: 'ரத்து' },
     originLabel:  { en: 'Origin Type',     si: 'සම්භව වර්ගය',        ta: 'தோற்ற வகை' },
     selectOrigin: { en: 'Select origin',   si: 'සම්භවය තෝරන්න',     ta: 'தோற்றத்தை தேர்ந்தெடுக்கவும்' },
-    ekadeshiya:   { en: 'Ekadeshiya (Native/Endemic)',  si: 'ඒකදේශීය (දේශීය / ආවේණික)', ta: 'ஏகதேசிய (உள்ளூர் / ஆவேணிக)' },
-    videshiya:    { en: 'Videshiya (Exotic/Foreign)',   si: 'විදේශීය (ආගන්තුක / විදේශ)',  ta: 'விதேசிய (வெளிநாட்டு)' },
+    endemic: { en: '🌿 Endemic to Sri Lanka',      si: '🌿 ශ්‍රී ලංකාවට පමණක් ආවේණික',             ta: '🌿 இலங்கைக்கு மட்டும் உரிய' },
+    native:  { en: '🌍 Native to Sri Lanka',       si: '🌍 ශ්‍රී ලංකාවේ ස්වභාවිකව (වෙනත් රටවලත්)', ta: '🌍 இலங்கையில் இயல்பாக (பிற நாடுகளிலும்)' },
+    exotic:  { en: '✈️ Exotic / Introduced',       si: '✈️ විදේශීය / හඳුන්වා දුන්',                ta: '✈️ வெளிநாட்டு / அறிமுகப்படுத்தப்பட்டது' },
   },
 
   // ── Category labels ──────────────────────────────────
@@ -199,12 +200,22 @@ export const t = {
 
   // ── Origin ───────────────────────────────────────────
   origin: {
-    ekadeshiya: { en: 'Ekadeshiya (Native)',  si: 'ඒකදේශීය (දේශීය)',   ta: 'ஏகதேசிய (உள்ளூர்)' },
-    videshiya:  { en: 'Videshiya (Exotic)',   si: 'විදේශීය (ආගන්තුක)', ta: 'விதேசிய (வெளிநாட்டு)' },
+    endemic: {
+      en: 'Endemic to Sri Lanka',
+      si: 'ශ්‍රී ලංකාවට පමණක් ආවේණික',
+      ta: 'இலங்கைக்கு மட்டும் உரிய'
+    },
+    native: {
+      en: 'Native to Sri Lanka',
+      si: 'ශ්‍රී ලංකාවේ ස්වභාවිකව සිටින (වෙනත් රටවලත් සිටින)',
+      ta: 'இலங்கையில் இயல்பாக வாழும் (பிற நாடுகளிலும்)'
+    },
+    exotic: {
+      en: 'Exotic / Introduced',
+      si: 'විදේශීය / හඳුන්වා දුන් (වෙනත් රටකින් ගෙනාපු)',
+      ta: 'வெளிநாட்டு / அறிமுகப்படுத்தப்பட்டது'
+    },
   },
-  originLabel: { en: 'Origin', si: 'සම්භවය', ta: 'தோற்றம்' },
-  originAll:   { en: 'All Origins', si: 'සියලු සම්භව', ta: 'அனைத்து தோற்றங்கள்' },
-  originHint:  { en: 'Ekadeshiya = native/endemic · Videshiya = exotic/foreign',
-                 si: 'ඒකදේශීය = දේශීය/ආවේණික · විදේශීය = ආගන්තුක',
-                 ta: 'ஏகதேசிய = உள்ளூர் · விதேசிய = வெளிநாட்டு' },
+  originLabel: { en: 'Origin Type',   si: 'සම්භව වර්ගය',    ta: 'தோற்ற வகை' },
+  originAll:   { en: 'All Origins',   si: 'සියලු සම්භව',    ta: 'அனைத்து தோற்றங்கள்' },
 }

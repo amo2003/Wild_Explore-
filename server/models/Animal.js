@@ -6,7 +6,7 @@ const animalSchema = new mongoose.Schema(
     scientificName:     { type: String, required: true, trim: true },
     category:           { type: String, required: true },
     conservationStatus: { type: String, default: '' },
-    origin:             { type: String, enum: ['ekadeshiya', 'videshiya', ''], default: '' },
+    origin: { type: String, enum: ['endemic', 'native', 'exotic', ''], default: '' },
 
     // Taxonomy
     className:  { type: String, default: '' },

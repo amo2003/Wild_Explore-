@@ -195,8 +195,9 @@ export default function EditAnimal() {
               <Field label={tr(t.form.originLabel)}>
                 <select name="origin" value={form.origin} onChange={handleChange} className={inputClass}>
                   <option value="">{tr(t.form.selectOrigin)}</option>
-                  <option value="ekadeshiya">🏡 {tr(t.form.ekadeshiya)}</option>
-                  <option value="videshiya">✈️ {tr(t.form.videshiya)}</option>
+                  <option value="endemic">{tr(t.form.endemic)}</option>
+                  <option value="native">{tr(t.form.native)}</option>
+                  <option value="exotic">{tr(t.form.exotic)}</option>
                 </select>
               </Field>
             </div>
