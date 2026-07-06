@@ -164,7 +164,7 @@ export default function AnimalIdentifier() {
   const fileRef = useRef(null)
   const timerRef = useRef(null)
 
-  // ── Handle file selection ──────────────────────────────
+  // ── Handle file selection — normalise EXIF orientation via canvas ──────────
   function handleFile(e) {
     const file = e.target.files[0]
     if (!file) return
@@ -176,8 +176,19 @@ export default function AnimalIdentifier() {
     setPredictions([])
     setTop(null)
     setDbResult(null)
-    const url = URL.createObjectURL(file)
-    setImageUrl(url)
+
+    // Draw onto canvas so browser applies EXIF rotation — fixes mobile photos
+    const raw = URL.createObjectURL(file)
+    const img = new Image()
+    img.onload = () => {
+      const canvas = document.createElement('canvas')
+      canvas.width  = img.naturalWidth
+      canvas.height = img.naturalHeight
+      canvas.getContext('2d').drawImage(img, 0, 0)
+      URL.revokeObjectURL(raw)
+      setImageUrl(canvas.toDataURL('image/jpeg', 0.92))
+    }
+    img.src = raw
   }
 
   // ── Run identification ────────────────────────────────
