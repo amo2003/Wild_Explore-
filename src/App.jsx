@@ -3,6 +3,7 @@ import { AnimalProvider } from './context/AnimalContext'
 import { LanguageProvider } from './context/LanguageContext'
 import { AsgardeoProvider } from './context/AuthContext'
 import Navbar from './components/Navbar'
+import ScrollToTop from './components/ScrollToTop'
 import ProtectedRoute from './components/ProtectedRoute'
 import Home from './pages/Home'
 import Animals from './pages/Animals'
@@ -20,6 +21,7 @@ export default function App() {
       <BrowserRouter>
         <LanguageProvider>
           <AnimalProvider>
+            <ScrollToTop />
             <Routes>
               {/* ── Public routes (with Navbar) ── */}
               <Route path="/" element={<><Navbar /><Home /></>} />
