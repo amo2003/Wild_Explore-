@@ -13,6 +13,7 @@ import About from './pages/About'
 import Contact from './pages/Contact'
 import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
+import AnimalIdentifier from './pages/AnimalIdentifier'
 import './App.css'
 
 export default function App() {
@@ -27,9 +28,10 @@ export default function App() {
               <Route path="/" element={<><Navbar /><Home /></>} />
               <Route path="/animals" element={<><Navbar /><Animals /></>} />
               <Route path="/animals/:id" element={<><Navbar /><AnimalDetail /></>} />
-              <Route path="/about" element={<><Navbar /><About /></>} />
-              <Route path="/contact" element={<><Navbar /><Contact /></>} />
-              <Route path="/login" element={<Login />} />
+              <Route path="/about"    element={<><Navbar /><About /></>} />
+              <Route path="/contact"  element={<><Navbar /><Contact /></>} />
+              <Route path="/identify" element={<><Navbar /><AnimalIdentifier /></>} />
+              <Route path="/login"    element={<Login />} />
 
               {/* ── Admin routes (no Navbar, Asgardeo protected) ── */}
               <Route path="/dashboard" element={

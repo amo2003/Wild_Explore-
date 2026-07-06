@@ -3,6 +3,8 @@ import express from 'express'
 import cors from 'cors'
 import mongoose from 'mongoose'
 import animalRoutes from './routes/animals.js'
+import searchRoutes from './routes/search.js'
+import imageRoutes  from './routes/images.js'
 
 const app  = express()
 const PORT = process.env.PORT || 5000
@@ -33,6 +35,8 @@ app.use(express.json())
 
 // ── Routes ───────────────────────────────────────────────
 app.use('/api/animals', animalRoutes)
+app.use('/api/animals/search', searchRoutes)
+app.use('/api/images', imageRoutes)
 
 app.get('/api/health', (_, res) => res.json({ status: 'ok' }))
 

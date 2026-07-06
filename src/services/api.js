@@ -17,4 +17,7 @@ export const api = {
   createAnimal:  (body)     => request('/animals',      { method: 'POST',   body: JSON.stringify(body) }),
   updateAnimal:  (id, body) => request(`/animals/${id}`, { method: 'PUT',    body: JSON.stringify(body) }),
   deleteAnimal:  (id)       => request(`/animals/${id}`, { method: 'DELETE' }),
+
+  // Fetch an external image URL through our server and return a base64 data URI
+  uploadImageUrl: (url) => request('/images/upload-url', { method: 'POST', body: JSON.stringify({ url }) }),
 }

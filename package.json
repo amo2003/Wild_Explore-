@@ -12,6 +12,9 @@
   "dependencies": {
     "@asgardeo/auth-react": "^5.6.2",
     "@tailwindcss/vite": "^4.3.2",
+    "@tensorflow-models/mobilenet": "^2.1.1",
+    "@tensorflow/tfjs": "4.22.0",
+    "axios": "^1.18.1",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "react-router-dom": "^7.18.1",

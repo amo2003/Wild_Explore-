@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { useAnimals } from '../context/AnimalContext'
 import { CATEGORIES } from '../data/animals'
 import { useLang } from '../context/LanguageContext'
+import { api } from '../services/api'
 
 const CONSERVATION_STATUSES = [
   'Least Concern', 'Near Threatened', 'Vulnerable',
@@ -85,11 +86,29 @@ export default function AddAnimal() {
     setSaving(true)
     setSaveError('')
     try {
-      const cleanImages = form.images.filter(u => u.trim())
+      const rawImages = form.images.filter(u => u.trim())
+
+      // Convert each URL to a stored base64 data URI via our server proxy
+      setSaveError('Uploading images…')
+      const resolvedImages = await Promise.all(
+        rawImages.map(async (url) => {
+          // Already a data URI or a relative path — keep as-is
+          if (url.startsWith('data:') || url.startsWith('/')) return url
+          try {
+            const { dataUri } = await api.uploadImageUrl(url)
+            return dataUri
+          } catch {
+            // If fetch fails, fall back to the original URL
+            return url
+          }
+        })
+      )
+      setSaveError('')
+
       await addAnimal({
         ...form,
-        images: cleanImages,
-        image: cleanImages[0] || '',
+        images: resolvedImages,
+        image: resolvedImages[0] || '',
         averageWeight: form.maleWeight || form.femaleWeight || '',
         averageHeight: form.maleHeight || form.femaleHeight || '',
       })
@@ -341,9 +360,18 @@ export default function AddAnimal() {
           </div>
 
           <div className="flex flex-col sm:flex-row gap-3">
-            {saveError && (
+            {saveError && saveError !== 'Uploading images…' && (
               <div className="sm:col-span-2 w-full bg-red-50 border border-red-300 text-red-700 text-sm rounded-xl px-4 py-3">
                 ❌ {saveError}
+              </div>
+            )}
+            {saveError === 'Uploading images…' && (
+              <div className="sm:col-span-2 w-full bg-blue-50 border border-blue-200 text-blue-700 text-sm rounded-xl px-4 py-3 flex items-center gap-2">
+                <svg className="animate-spin w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+                </svg>
+                Downloading and storing images…
               </div>
             )}
             <button type="submit" disabled={saving}
@@ -354,7 +382,7 @@ export default function AddAnimal() {
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
                   </svg>
-                  Saving…
+                  {saveError === 'Uploading images…' ? 'Uploading images…' : 'Saving…'}
                 </>
               ) : tr(t.form.submitAdd)}
             </button>

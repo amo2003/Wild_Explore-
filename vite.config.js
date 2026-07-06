@@ -8,7 +8,23 @@ export default defineConfig({
     react(),
   ],
   optimizeDeps: {
-    include: ['@asgardeo/auth-react', '@asgardeo/auth-spa'],
+    include: [
+      '@asgardeo/auth-react',
+      '@asgardeo/auth-spa',
+      '@tensorflow/tfjs',
+      '@tensorflow/tfjs-core',
+      '@tensorflow/tfjs-backend-cpu',
+      '@tensorflow/tfjs-backend-webgl',
+      '@tensorflow/tfjs-layers',
+      '@tensorflow/tfjs-converter',
+      '@tensorflow-models/mobilenet',
+    ],
+    rolldownOptions: {
+      define: { 'global': 'globalThis' },
+    },
+  },
+  build: {
+    chunkSizeWarningLimit: 1500,
   },
   resolve: {
     dedupe: ['react', 'react-dom'],

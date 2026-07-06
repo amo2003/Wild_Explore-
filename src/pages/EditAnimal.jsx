@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useAnimals } from '../context/AnimalContext'
 import { CATEGORIES } from '../data/animals'
 import { useLang } from '../context/LanguageContext'
+import { api } from '../services/api'
 
 const CONSERVATION_STATUSES = [
   'Least Concern', 'Near Threatened', 'Vulnerable',
@@ -119,11 +120,24 @@ export default function EditAnimal() {
     setSaving(true)
     setSaveError('')
     try {
-      const cleanImages = form.images.filter(u => u.trim())
+      const rawImages = form.images.filter(u => u.trim())
+
+      const resolvedImages = await Promise.all(
+        rawImages.map(async (url) => {
+          if (url.startsWith('data:') || url.startsWith('/')) return url
+          try {
+            const { dataUri } = await api.uploadImageUrl(url)
+            return dataUri
+          } catch {
+            return url
+          }
+        })
+      )
+
       await updateAnimal(id, {
         ...form,
-        images: cleanImages,
-        image: cleanImages[0] || '',
+        images: resolvedImages,
+        image: resolvedImages[0] || '',
         averageWeight: form.maleWeight || form.femaleWeight || '',
         averageHeight: form.maleHeight || form.femaleHeight || '',
       })
