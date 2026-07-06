@@ -18,15 +18,17 @@ export default defineConfig({
       '@tensorflow/tfjs-layers',
       '@tensorflow/tfjs-converter',
       '@tensorflow-models/mobilenet',
+      '@tensorflow-models/mobilenet/dist/imagenet_classes',
     ],
-    rolldownOptions: {
-      define: { 'global': 'globalThis' },
-    },
   },
   build: {
     chunkSizeWarningLimit: 1500,
   },
   resolve: {
     dedupe: ['react', 'react-dom'],
+  },
+  // Polyfill `global` for CJS packages that reference it in the browser
+  define: {
+    'global': 'globalThis',
   },
 })

@@ -5,41 +5,71 @@ import { CATEGORIES, STATUS_COLORS } from '../data/animals'
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
 
-// ── Load TF + MobileNet from CDN (avoids CJS/ESM bundling issues) ────────────
-let tfLoaded = false
-
-async function loadTFScripts(onStatus) {
-  if (tfLoaded) return
-
-  const load = (src) => new Promise((resolve, reject) => {
-    if (document.querySelector(`script[src="${src}"]`)) { resolve(); return }
-    const s = document.createElement('script')
-    s.src = src
-    s.onload = resolve
-    s.onerror = () => reject(new Error(`Failed to load ${src}`))
-    document.head.appendChild(s)
-  })
-
-  onStatus('Loading TensorFlow.js from CDN…')
-  await load('https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.22.0/dist/tf.min.js')
-
-  onStatus('Loading MobileNet model script…')
-  await load('https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.1/dist/mobilenet.min.js')
-
-  tfLoaded = true
-}
-
+// ── Run MobileNet via tf.loadLayersModel (local files) ───────────────────────
 async function runMobileNet(imgElement, onStatus) {
-  await loadTFScripts(onStatus)
+  onStatus('Loading TensorFlow.js…')
+  let tf
+  try {
+    tf = await import('@tensorflow/tfjs')
+  } catch (e) {
+    throw new Error(`TensorFlow failed to load: ${e.message}`)
+  }
+  try {
+    await tf.ready()
+  } catch (e) {
+    throw new Error(`TensorFlow backend failed to init: ${e.message}`)
+  }
 
-  onStatus('Initialising TensorFlow backend…')
-  await window.tf.ready()
-
-  onStatus('Downloading model weights… (~17 MB, first run only)')
-  const model = await window.mobilenet.load()
+  onStatus('Loading MobileNet model from local files…')
+  let model
+  try {
+    model = await tf.loadLayersModel('/mobilenet/model.json')
+  } catch (e) {
+    throw new Error(`Model failed to load: ${e.message}`)
+  }
 
   onStatus('Analysing your image…')
-  return model.classify(imgElement)
+  // Pre-process: resize to 224×224, normalise to [-1, 1]
+  const tensor = tf.tidy(() => {
+    return tf.image
+      .resizeBilinear(tf.browser.fromPixels(imgElement), [224, 224])
+      .toFloat()
+      .div(127.5)
+      .sub(1)
+      .expandDims(0)
+  })
+
+  let predictions
+  try {
+    const output = model.predict(tensor)
+    const scores = await output.data()
+    tensor.dispose()
+    output.dispose()
+
+    // Get ImageNet class names
+    let classes
+    try {
+      const { IMAGENET_CLASSES } = await import('@tensorflow-models/mobilenet/dist/imagenet_classes')
+      classes = IMAGENET_CLASSES
+    } catch (_) {
+      classes = null
+    }
+
+    // Top-3 predictions
+    const indexed = Array.from(scores).map((prob, i) => ({ prob, i }))
+    indexed.sort((a, b) => b.prob - a.prob)
+    const top3 = indexed.slice(0, 3)
+
+    predictions = top3.map(({ prob, i }) => ({
+      className: classes ? (classes[i] || `class_${i}`) : `class_${i}`,
+      probability: prob,
+    }))
+  } catch (e) {
+    tensor.dispose()
+    throw new Error(`Inference failed: ${e.message}`)
+  }
+
+  return predictions
 }
 
 // ── Confidence bar colour ────────────────────────────────────────────────────
@@ -166,16 +196,9 @@ export default function AnimalIdentifier() {
       setElapsed(Math.floor((Date.now() - start) / 1000))
     }, 1000)
 
-    // 120-second hard timeout
-    const timeout = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error('Timed out after 120 s. The model weights (~17 MB) may be slow to download — check your connection and try again.')), 120000)
-    )
-
+    // No hard timeout — let TF/network errors surface naturally
     try {
-      const preds = await Promise.race([
-        runMobileNet(imgRef.current, setModelStatus),
-        timeout,
-      ])
+      const preds = await runMobileNet(imgRef.current, setModelStatus)
       setPredictions(preds)
 
       const best = preds[0]
@@ -297,8 +320,8 @@ export default function AnimalIdentifier() {
             )}
             {loading && (
               <div className="mt-3 bg-blue-50 border border-blue-100 rounded-xl px-4 py-3 text-xs text-blue-700 flex flex-col gap-1">
-                <p className="font-semibold">🧠 AI is working — this can take 20–40 seconds on first run</p>
-                <p className="text-blue-500">TensorFlow + MobileNet (~17 MB) must download and initialise. Subsequent runs are faster.</p>
+                <p className="font-semibold">🧠 AI is working — model loads from local files, should be fast</p>
+                <p className="text-blue-500">TensorFlow is initialising the MobileNet model. This takes a few seconds.</p>
               </div>
             )}
           </div>
