@@ -7,4 +7,10 @@ export default defineConfig({
     tailwindcss(),
     react(),
   ],
+  optimizeDeps: {
+    include: ['@asgardeo/auth-react', '@asgardeo/auth-spa'],
+  },
+  resolve: {
+    dedupe: ['react', 'react-dom'],
+  },
 })

@@ -390,19 +390,11 @@ export default function AnimalDetail() {
               </div>
             </div>
 
-            {/* Actions */}
-            <div className="mt-8 pt-5 border-t border-gray-100 flex flex-col sm:flex-row gap-3 flex-wrap">
+            {/* Actions — Back to Animals only */}
+            <div className="mt-8 pt-5 border-t border-gray-100">
               <Link to="/animals"
-                className="text-center inline-flex items-center justify-center gap-2 bg-green-700 hover:bg-green-800 text-white font-semibold px-5 py-3 rounded-xl transition-all text-sm">
+                className="inline-flex items-center justify-center gap-2 bg-green-700 hover:bg-green-800 text-white font-semibold px-5 py-3 rounded-xl transition-all text-sm">
                 {tr(t.detail.backAnimals)}
-              </Link>
-              <Link to={`/animals/${animal.id}/edit`}
-                className="text-center inline-flex items-center justify-center gap-2 bg-green-100 hover:bg-green-200 text-green-800 font-semibold px-5 py-3 rounded-xl transition-all text-sm">
-                {tr(t.detail.editAnimal)}
-              </Link>
-              <Link to="/add"
-                className="text-center inline-flex items-center justify-center gap-2 border border-green-700 text-green-700 hover:bg-green-50 font-semibold px-5 py-3 rounded-xl transition-all text-sm">
-                {tr(t.detail.addAnother)}
               </Link>
             </div>
           </div>

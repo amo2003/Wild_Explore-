@@ -1,34 +1,45 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { AnimalProvider } from './context/AnimalContext'
 import { LanguageProvider } from './context/LanguageContext'
+import { AsgardeoProvider } from './context/AuthContext'
 import Navbar from './components/Navbar'
+import ProtectedRoute from './components/ProtectedRoute'
 import Home from './pages/Home'
 import Animals from './pages/Animals'
 import AnimalDetail from './pages/AnimalDetail'
-import AddAnimal from './pages/AddAnimal'
 import EditAnimal from './pages/EditAnimal'
-import './App.css'
-import Contact from './pages/Contact'
 import About from './pages/About'
+import Contact from './pages/Contact'
+import Login from './pages/Login'
+import Dashboard from './pages/Dashboard'
+import './App.css'
 
 export default function App() {
   return (
-    <BrowserRouter>
-      <LanguageProvider>
-        <AnimalProvider>
-          <Navbar />
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/animals" element={<Animals />} />
-            <Route path="/animals/:id" element={<AnimalDetail />} />
-            <Route path="/animals/:id/edit" element={<EditAnimal />} />
-            <Route path="/add" element={<AddAnimal />} />
-                        <Route path="/contact" element={<Contact />} />
-            <Route path="/about" element={<About />} />
+    <AsgardeoProvider>
+      <BrowserRouter>
+        <LanguageProvider>
+          <AnimalProvider>
+            <Routes>
+              {/* ── Public routes (with Navbar) ── */}
+              <Route path="/" element={<><Navbar /><Home /></>} />
+              <Route path="/animals" element={<><Navbar /><Animals /></>} />
+              <Route path="/animals/:id" element={<><Navbar /><AnimalDetail /></>} />
+              <Route path="/about" element={<><Navbar /><About /></>} />
+              <Route path="/contact" element={<><Navbar /><Contact /></>} />
+              <Route path="/login" element={<Login />} />
 
-          </Routes>
-        </AnimalProvider>
-      </LanguageProvider>
-    </BrowserRouter>
+              {/* ── Admin routes (no Navbar, Asgardeo protected) ── */}
+              <Route path="/dashboard" element={
+                <ProtectedRoute><Dashboard /></ProtectedRoute>
+              } />
+              <Route path="/dashboard/edit/:id" element={
+                <ProtectedRoute><EditAnimal isDashboard /></ProtectedRoute>
+              } />
+            </Routes>
+          </AnimalProvider>
+        </LanguageProvider>
+      </BrowserRouter>
+    </AsgardeoProvider>
   )
 }
