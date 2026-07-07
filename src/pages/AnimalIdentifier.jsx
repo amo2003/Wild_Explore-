@@ -29,14 +29,17 @@ async function runMobileNet(imgElement, onStatus) {
   }
 
   onStatus('Analysing your image…')
-  // Get ImageData from canvas — works on mobile even when canvas is hidden
-  const ctx = imgElement.getContext('2d')
-  const imageData = ctx.getImageData(0, 0, imgElement.width, imgElement.height)
+  // Pre-resize to 224×224 on CPU canvas before giving to TF
+  // This avoids mobile WebGL memory issues with large phone camera images
+  const small = document.createElement('canvas')
+  small.width  = 224
+  small.height = 224
+  small.getContext('2d').drawImage(imgElement, 0, 0, imgElement.width, imgElement.height, 0, 0, 224, 224)
+  const imageData = small.getContext('2d').getImageData(0, 0, 224, 224)
 
-  // Pre-process: resize to 224×224, normalise to [-1, 1]
+  // Normalise to [-1, 1]
   const tensor = tf.tidy(() => {
-    return tf.image
-      .resizeBilinear(tf.browser.fromPixels(imageData), [224, 224])
+    return tf.browser.fromPixels(imageData)
       .toFloat()
       .div(127.5)
       .sub(1)
