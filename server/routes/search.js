@@ -5,33 +5,30 @@ const router = Router()
 
 /**
  * GET /api/animals/search/:name
- * Search for an animal by predicted name (case-insensitive regex match)
+ * Search for an animal by predicted name (case-insensitive match on name/scientificName only)
  * Used by the AI identifier feature
  */
 router.get('/:name', async (req, res) => {
   try {
     const { name } = req.params
 
-    // Extract key animal word from MobileNet class string
-    // e.g. "tiger cat" → try "tiger" first, then full string
+    // Extract words from MobileNet label, e.g. "ostrich, Struthio camelus" → ["ostrich", "Struthio", "camelus"]
     const words = name.split(/[\s,]+/).filter(w => w.length > 3)
 
     let animal = null
 
-    // Try each word from the prediction label, longest first
+    // 1. Try exact word match on name or scientificName only (NOT description/food)
     for (const word of words) {
       animal = await Animal.findOne({
         $or: [
-          { name:           new RegExp(word, 'i') },
-          { scientificName: new RegExp(word, 'i') },
-          { description:    new RegExp(word, 'i') },
-          { food:           new RegExp(word, 'i') },
+          { name:           new RegExp(`\\b${word}\\b`, 'i') },
+          { scientificName: new RegExp(`\\b${word}\\b`, 'i') },
         ]
       })
       if (animal) break
     }
 
-    // Fallback: try full string
+    // 2. Fallback: partial match on full label string
     if (!animal) {
       animal = await Animal.findOne({
         $or: [
