@@ -5,17 +5,29 @@ import { CATEGORIES, STATUS_COLORS } from '../data/animals'
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
 
-// ── Run MobileNet via tf.loadLayersModel (local files) ───────────────────────
+// ── Load a script tag once (CDN) ─────────────────────────────────────────────
+function loadScript(src) {
+  return new Promise((resolve, reject) => {
+    if (document.querySelector(`script[src="${src}"]`)) return resolve()
+    const s = document.createElement('script')
+    s.src = src
+    s.onload = resolve
+    s.onerror = () => reject(new Error(`Failed to load script: ${src}`))
+    document.head.appendChild(s)
+  })
+}
+
+// ── Run MobileNet via CDN TF + local model files ──────────────────────────────
 async function runMobileNet(imgElement, onStatus) {
   onStatus('Loading TensorFlow.js…')
-  let tf
   try {
-    tf = await import('@tensorflow/tfjs')
+    await loadScript('https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.22.0/dist/tf.min.js')
   } catch (e) {
     throw new Error(`TensorFlow failed to load: ${e.message}`)
   }
+
+  const tf = window.tf
   try {
-    // Force CPU backend — WebGL on mobile gives corrupted results
     await tf.setBackend('cpu')
     await tf.ready()
   } catch (e) {
@@ -31,15 +43,12 @@ async function runMobileNet(imgElement, onStatus) {
   }
 
   onStatus('Analysing your image…')
-  // Pre-resize to 224×224 on CPU canvas before giving to TF
-  // This avoids mobile WebGL memory issues with large phone camera images
   const small = document.createElement('canvas')
   small.width  = 224
   small.height = 224
   small.getContext('2d').drawImage(imgElement, 0, 0, imgElement.width, imgElement.height, 0, 0, 224, 224)
   const imageData = small.getContext('2d').getImageData(0, 0, 224, 224)
 
-  // Normalise to [-1, 1]
   const tensor = tf.tidy(() => {
     return tf.browser.fromPixels(imageData)
       .toFloat()
@@ -55,22 +64,15 @@ async function runMobileNet(imgElement, onStatus) {
     tensor.dispose()
     output.dispose()
 
-    // Get ImageNet class names
-    let classes
-    try {
-      const { IMAGENET_CLASSES } = await import('@tensorflow-models/mobilenet/dist/imagenet_classes')
-      classes = IMAGENET_CLASSES
-    } catch (_) {
-      classes = null
-    }
+    // ImageNet class labels bundled inline (top 1000)
+    const { IMAGENET_CLASSES } = await import('@tensorflow-models/mobilenet/dist/imagenet_classes')
 
-    // Top-3 predictions
     const indexed = Array.from(scores).map((prob, i) => ({ prob, i }))
     indexed.sort((a, b) => b.prob - a.prob)
     const top3 = indexed.slice(0, 3)
 
     predictions = top3.map(({ prob, i }) => ({
-      className: classes ? (classes[i] || `class_${i}`) : `class_${i}`,
+      className: IMAGENET_CLASSES ? (IMAGENET_CLASSES[i] || `class_${i}`) : `class_${i}`,
       probability: prob,
     }))
   } catch (e) {

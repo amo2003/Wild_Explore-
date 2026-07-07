@@ -11,13 +11,6 @@ export default defineConfig({
     include: [
       '@asgardeo/auth-react',
       '@asgardeo/auth-spa',
-      '@tensorflow/tfjs',
-      '@tensorflow/tfjs-core',
-      '@tensorflow/tfjs-backend-cpu',
-      '@tensorflow/tfjs-backend-webgl',
-      '@tensorflow/tfjs-layers',
-      '@tensorflow/tfjs-converter',
-      '@tensorflow-models/mobilenet',
       '@tensorflow-models/mobilenet/dist/imagenet_classes',
     ],
   },
