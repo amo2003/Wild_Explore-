@@ -5,6 +5,25 @@ import { CATEGORIES } from '../data/animals'
 import { useLang } from '../context/LanguageContext'
 import { api } from '../services/api'
 
+// Compress a base64 dataURI to max `maxWidth` px, JPEG quality 0.75
+function compressDataUri(dataUri, maxWidth = 800) {
+  return new Promise((resolve) => {
+    const img = new Image()
+    img.onload = () => {
+      const scale = Math.min(1, maxWidth / img.naturalWidth)
+      const w = Math.round(img.naturalWidth * scale)
+      const h = Math.round(img.naturalHeight * scale)
+      const canvas = document.createElement('canvas')
+      canvas.width = w
+      canvas.height = h
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h)
+      resolve(canvas.toDataURL('image/jpeg', 0.75))
+    }
+    img.onerror = () => resolve(dataUri) // fallback
+    img.src = dataUri
+  })
+}
+
 const CONSERVATION_STATUSES = [
   'Least Concern', 'Near Threatened', 'Vulnerable',
   'Endangered', 'Critically Endangered', 'Extinct in the Wild', 'Extinct',
@@ -92,13 +111,12 @@ export default function AddAnimal() {
       setSaveError('Uploading images…')
       const resolvedImages = await Promise.all(
         rawImages.map(async (url) => {
-          // Already a data URI or a relative path — keep as-is
           if (url.startsWith('data:') || url.startsWith('/')) return url
           try {
-            const { dataUri } = await api.uploadImageUrl(url)
-            return dataUri
+            const result = await api.uploadImageUrl(url)
+            // Compress the base64 image to max 800px wide before storing
+            return await compressDataUri(result.dataUri, 800)
           } catch {
-            // If fetch fails, fall back to the original URL
             return url
           }
         })
