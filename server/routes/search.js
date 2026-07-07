@@ -3,22 +3,31 @@ import Animal from '../models/Animal.js'
 
 const router = Router()
 
+// Common adjectives/qualifiers in ImageNet labels that are NOT the animal name
+const SKIP_WORDS = new Set([
+  'indian','african','asian','american','european','sri','lankan','eastern','western',
+  'northern','southern','common','giant','great','lesser','greater','little','large',
+  'small','wild','domestic','black','white','red','blue','green','grey','gray',
+  'brown','spotted','striped','horned','tusker','male','female','baby','young',
+])
+
 /**
  * GET /api/animals/search/:name
- * Search for an animal by predicted name (case-insensitive match on name/scientificName only)
- * Used by the AI identifier feature
+ * Search for an animal by predicted name (name/scientificName only)
  */
 router.get('/:name', async (req, res) => {
   try {
     const { name } = req.params
 
-    // Extract words from MobileNet label, e.g. "ostrich, Struthio camelus" → ["ostrich", "Struthio", "camelus"]
-    const words = name.split(/[\s,]+/).filter(w => w.length > 3)
+    // Split label into words, filter short/skip words, prioritise non-qualifier words
+    const allWords = name.split(/[\s,]+/).filter(w => w.length > 3)
+    const animalWords = allWords.filter(w => !SKIP_WORDS.has(w.toLowerCase()))
+    const searchWords = animalWords.length > 0 ? animalWords : allWords
 
     let animal = null
 
-    // 1. Try exact word match on name or scientificName only (NOT description/food)
-    for (const word of words) {
+    // 1. Try each meaningful word with word-boundary match on name/scientificName
+    for (const word of searchWords) {
       animal = await Animal.findOne({
         $or: [
           { name:           new RegExp(`\\b${word}\\b`, 'i') },
@@ -28,7 +37,7 @@ router.get('/:name', async (req, res) => {
       if (animal) break
     }
 
-    // 2. Fallback: partial match on full label string
+    // 2. Fallback: try full label string
     if (!animal) {
       animal = await Animal.findOne({
         $or: [
