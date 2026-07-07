@@ -15,6 +15,8 @@ async function runMobileNet(imgElement, onStatus) {
     throw new Error(`TensorFlow failed to load: ${e.message}`)
   }
   try {
+    // Force CPU backend — WebGL on mobile gives corrupted results
+    await tf.setBackend('cpu')
     await tf.ready()
   } catch (e) {
     throw new Error(`TensorFlow backend failed to init: ${e.message}`)
