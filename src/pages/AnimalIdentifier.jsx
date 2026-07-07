@@ -160,11 +160,58 @@ export default function AnimalIdentifier() {
   const [dbResult, setDbResult]       = useState(null)
   const [dbLoading, setDbLoading]     = useState(false)
   const [error, setError]             = useState('')
-  const imgRef  = useRef(null)
-  const fileRef = useRef(null)
-  const timerRef = useRef(null)
+  const canvasRef = useRef(null)
+  const fileRef   = useRef(null)
+  const timerRef  = useRef(null)
 
-  // ── Handle file selection — normalise EXIF orientation via canvas ──────────
+  // ── Read EXIF orientation from JPEG bytes ──────────────────────────────────
+  function getExifOrientation(buffer) {
+    const view = new DataView(buffer)
+    if (view.getUint16(0, false) !== 0xFFD8) return 1
+    let offset = 2
+    while (offset < view.byteLength) {
+      const marker = view.getUint16(offset, false)
+      offset += 2
+      if (marker === 0xFFE1) {
+        if (view.getUint32(offset + 2, false) !== 0x45786966) return 1
+        const little = view.getUint16(offset + 8, false) === 0x4949
+        const ifdOffset = offset + 8 + view.getUint32(offset + 12, little)
+        const tags = view.getUint16(ifdOffset, little)
+        for (let i = 0; i < tags; i++) {
+          if (view.getUint16(ifdOffset + 2 + i * 12, little) === 0x0112) {
+            return view.getUint16(ifdOffset + 2 + i * 12 + 8, little)
+          }
+        }
+      } else if ((marker & 0xFF00) !== 0xFF00) break
+      else offset += view.getUint16(offset, false)
+    }
+    return 1
+  }
+
+  // ── Draw image onto canvas with EXIF rotation corrected ───────────────────
+  function drawOrientedToCanvas(img, orientation, canvas) {
+    const w = img.naturalWidth
+    const h = img.naturalHeight
+    const swapped = orientation >= 5
+    canvas.width  = swapped ? h : w
+    canvas.height = swapped ? w : h
+    const ctx = canvas.getContext('2d')
+    ctx.save()
+    switch (orientation) {
+      case 2: ctx.transform(-1, 0, 0, 1, w, 0); break
+      case 3: ctx.transform(-1, 0, 0, -1, w, h); break
+      case 4: ctx.transform(1, 0, 0, -1, 0, h); break
+      case 5: ctx.transform(0, 1, 1, 0, 0, 0); break
+      case 6: ctx.transform(0, 1, -1, 0, h, 0); break
+      case 7: ctx.transform(0, -1, -1, 0, h, w); break
+      case 8: ctx.transform(0, -1, 1, 0, 0, w); break
+      default: break
+    }
+    ctx.drawImage(img, 0, 0)
+    ctx.restore()
+  }
+
+  // ── Handle file selection ──────────────────────────────────────────────────
   function handleFile(e) {
     const file = e.target.files[0]
     if (!file) return
@@ -177,23 +224,27 @@ export default function AnimalIdentifier() {
     setTop(null)
     setDbResult(null)
 
-    // Draw onto canvas so browser applies EXIF rotation — fixes mobile photos
-    const raw = URL.createObjectURL(file)
-    const img = new Image()
-    img.onload = () => {
-      const canvas = document.createElement('canvas')
-      canvas.width  = img.naturalWidth
-      canvas.height = img.naturalHeight
-      canvas.getContext('2d').drawImage(img, 0, 0)
-      URL.revokeObjectURL(raw)
-      setImageUrl(canvas.toDataURL('image/jpeg', 0.92))
+    const reader = new FileReader()
+    reader.onload = (ev) => {
+      const buffer = ev.target.result
+      const orientation = getExifOrientation(buffer)
+      const blob = new Blob([buffer], { type: file.type })
+      const raw  = URL.createObjectURL(blob)
+      const img  = new Image()
+      img.onload = () => {
+        const canvas = canvasRef.current
+        drawOrientedToCanvas(img, orientation, canvas)
+        URL.revokeObjectURL(raw)
+        setImageUrl(canvas.toDataURL('image/jpeg', 0.92))
+      }
+      img.src = raw
     }
-    img.src = raw
+    reader.readAsArrayBuffer(file)
   }
 
   // ── Run identification ────────────────────────────────
   async function identify() {
-    if (!imgRef.current) return
+    if (!canvasRef.current) return
     setError('')
     setPredictions([])
     setTop(null)
@@ -209,7 +260,7 @@ export default function AnimalIdentifier() {
 
     // No hard timeout — let TF/network errors surface naturally
     try {
-      const preds = await runMobileNet(imgRef.current, setModelStatus)
+      const preds = await runMobileNet(canvasRef.current, setModelStatus)
       setPredictions(preds)
 
       const best = preds[0]
@@ -260,6 +311,9 @@ export default function AnimalIdentifier() {
           <div className="p-6">
             <h2 className="font-bold text-green-900 text-lg mb-4">📷 Upload Animal Photo</h2>
 
+            {/* Hidden canvas — holds EXIF-corrected pixels fed to TensorFlow */}
+            <canvas ref={canvasRef} className="hidden" />
+
             {/* Drop zone */}
             <div
               onClick={() => fileRef.current?.click()}
@@ -269,10 +323,8 @@ export default function AnimalIdentifier() {
             >
               {imageUrl ? (
                 <img
-                  ref={imgRef}
                   src={imageUrl}
                   alt="Preview"
-                  crossOrigin="anonymous"
                   className="max-h-72 mx-auto rounded-xl object-contain shadow-md"
                 />
               ) : (
