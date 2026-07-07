@@ -6,6 +6,10 @@ async function request(path, options = {}) {
     headers: { 'Content-Type': 'application/json' },
     ...options,
   })
+  const contentType = res.headers.get('content-type') || ''
+  if (!contentType.includes('application/json')) {
+    throw new Error(`Server error (HTTP ${res.status}) — check your API URL or server logs`)
+  }
   const data = await res.json()
   if (!res.ok) throw new Error(data.error || 'Request failed')
   return data

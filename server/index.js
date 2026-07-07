@@ -34,8 +34,8 @@ app.use(cors({
 app.use(express.json())
 
 // ── Routes ───────────────────────────────────────────────
+app.use('/api/animals/search', searchRoutes)  // must be before /api/animals
 app.use('/api/animals', animalRoutes)
-app.use('/api/animals/search', searchRoutes)
 app.use('/api/images', imageRoutes)
 
 app.get('/api/health', (_, res) => res.json({ status: 'ok' }))
