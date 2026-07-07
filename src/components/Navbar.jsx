@@ -13,10 +13,11 @@ export default function Navbar() {
   const links = [
     { to: '/',          label: tr(t.nav.home) },
     { to: '/animals',   label: tr(t.nav.animals) },
-    { to: '/identify',  label: '🔍 AI Identify' },
+    { to: '/map',       label: tr(t.nav.map) },
+    { to: '/identify',  label: tr(t.nav.aiIdentify) },
     { to: '/about',     label: tr(t.nav.about) },
     { to: '/contact',   label: tr(t.nav.contact) },
-    ...(!readonly ? [{ to: '/dashboard', label: '🛡️ Dashboard' }] : []),
+    ...(!readonly ? [{ to: '/dashboard', label: tr(t.nav.dashboard) }] : []),
   ]
 
   const currentLang = LANGUAGES.find(l => l.code === lang)

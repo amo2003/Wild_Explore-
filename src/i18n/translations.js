@@ -9,11 +9,14 @@ export const LANGUAGES = [
 export const t = {
   // ── Navbar ──────────────────────────────────────────
   nav: {
-    home:      { en: 'Home',       si: 'මුල් පිටුව',  ta: 'முகப்பு' },
-    animals:   { en: 'Animals',    si: 'සතුන්',        ta: 'விலங்குகள்' },
-    about:     { en: 'About Us',   si: 'අපි ගැන',      ta: 'எங்களைப் பற்றி' },
-    contact:   { en: 'Contact Us', si: 'අපව අමතන්න',  ta: 'எங்களைத் தொடர்பு கொள்ளுங்கள்' },
-    addAnimal: { en: '+ Add Animal', si: '+ සතෙකු එකතු කරන්න', ta: '+ விலங்கு சேர்க்க' },  
+    home:      { en: 'Home',          si: 'මුල් පිටුව',     ta: 'முகப்பு' },
+    animals:   { en: 'Animals',       si: 'සතුන්',           ta: 'விலங்குகள்' },
+    map:       { en: '🗺️ Map',        si: '🗺️ සිතියම',      ta: '🗺️ வரைபடம்' },
+    aiIdentify:{ en: '🔍 AI Identify', si: '🔍 AI හඳුනාගැනීම', ta: '🔍 AI அடையாளம்' },
+    about:     { en: 'About Us',      si: 'අපි ගැන',         ta: 'எங்களைப் பற்றி' },
+    contact:   { en: 'Contact Us',    si: 'අපව අමතන්න',     ta: 'எங்களைத் தொடர்பு கொள்ளுங்கள்' },
+    addAnimal: { en: '+ Add Animal',  si: '+ සතෙකු එකතු කරන්න', ta: '+ விலங்கு சேர்க்க' },
+    dashboard: { en: '🛡️ Dashboard',  si: '🛡️ පාලක මණ්ඩලය', ta: '🛡️ டாஷ்போர்டு' },
   },
 
   // ── Home ────────────────────────────────────────────

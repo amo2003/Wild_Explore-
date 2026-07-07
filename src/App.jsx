@@ -14,6 +14,7 @@ import Contact from './pages/Contact'
 import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
 import AnimalIdentifier from './pages/AnimalIdentifier'
+import MapPage from './pages/MapPage'
 import './App.css'
 
 export default function App() {
@@ -31,6 +32,7 @@ export default function App() {
               <Route path="/about"    element={<><Navbar /><About /></>} />
               <Route path="/contact"  element={<><Navbar /><Contact /></>} />
               <Route path="/identify" element={<><Navbar /><AnimalIdentifier /></>} />
+              <Route path="/map"      element={<><Navbar /><MapPage /></>} />
               <Route path="/login"    element={<Login />} />
 
               {/* ── Admin routes (no Navbar, Asgardeo protected) ── */}

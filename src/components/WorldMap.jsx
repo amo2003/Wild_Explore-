@@ -70,7 +70,7 @@ function spreadPins(animals, zoom) {
   })
 }
 
-export default function WorldMap({ animals }) {
+export default function WorldMap({ animals, fullscreen = false }) {
   const [paths, setPaths]   = useState([])
   const [hovered, setHovered] = useState(null)
   const [view, setView]     = useState({ tx: 0, ty: 0, scale: 1 })
@@ -143,7 +143,12 @@ export default function WorldMap({ animals }) {
   return (
     <div
       className="rounded-2xl overflow-hidden border-2 border-green-300 shadow-2xl relative"
-      style={{ background: '#7dd3fc', aspectRatio: `${VW}/${VH}`, userSelect: 'none' }}
+      style={{
+        background: '#7dd3fc',
+        aspectRatio: fullscreen ? undefined : `${VW}/${VH}`,
+        height: fullscreen ? '100%' : undefined,
+        userSelect: 'none'
+      }}
       onMouseMove={onMouseMove}
       onMouseUp={onMouseUp}
       onMouseLeave={onMouseUp}
