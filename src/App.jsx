@@ -15,6 +15,7 @@ import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
 import AnimalIdentifier from './pages/AnimalIdentifier'
 import MapPage from './pages/MapPage'
+import Compare from './pages/Compare'
 import './App.css'
 
 export default function App() {
@@ -33,6 +34,7 @@ export default function App() {
               <Route path="/contact"  element={<><Navbar /><Contact /></>} />
               <Route path="/identify" element={<><Navbar /><AnimalIdentifier /></>} />
               <Route path="/map"      element={<><Navbar /><MapPage /></>} />
+              <Route path="/compare"  element={<><Navbar /><Compare /></>} />
               <Route path="/login"    element={<Login />} />
 
               {/* ── Admin routes (no Navbar, Asgardeo protected) ── */}

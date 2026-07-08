@@ -1,26 +1,30 @@
 import { Link } from 'react-router-dom'
-
-const TEAM = [
-  { name: 'Amod Indupa', role: 'Founder & Lead Developer', avatar: '🧑‍💻', bio: 'Passionate about wildlife conservation and technology. Built WildExplore to make animal data accessible to everyone.' },
-  { name: 'Wildlife Researchers', role: 'Data Contributors', avatar: '🔬', bio: 'A network of researchers, zoologists and nature enthusiasts who contribute accurate scientific data.' },
-  { name: 'You', role: 'Community Member', avatar: '🌿', bio: 'Every person who explores, shares and cares about wildlife is part of the WildExplore family.' },
-]
+import { useLang } from '../context/LanguageContext'
 
 const STATS = [
-  { icon: '🌍', label: 'Continents', value: '6' },
-  { icon: '📂', label: 'Categories', value: '6+' },
-  { icon: '🔬', label: 'Scientific Fields', value: '10+' },
-  { icon: '🌐', label: 'Languages', value: '3' },
-]
-
-const VALUES = [
-  { icon: '🎯', title: 'Accuracy', desc: 'Every data point is verified against scientific sources — taxonomy, weight, habitat and conservation status.' },
-  { icon: '🌿', title: 'Conservation', desc: 'We highlight conservation status for every animal to raise awareness about endangered and vulnerable species.' },
-  { icon: '🤝', title: 'Community', desc: 'Built for educators, students, researchers, and anyone who loves the natural world.' },
-  { icon: '🌐', title: 'Accessibility', desc: 'Available in English, Sinhala and Tamil — breaking language barriers in wildlife education.' },
+  { icon: '🌍', labelKey: 'statsConts', value: '6' },
+  { icon: '📂', labelKey: 'statsCats',  value: '6+' },
+  { icon: '🔬', labelKey: 'statsSci',   value: '10+' },
+  { icon: '🌐', labelKey: 'statsLangs', value: '3' },
 ]
 
 export default function About() {
+  const { tr, t } = useLang()
+  const a = t.about
+
+  const VALUES = [
+    { icon: '🎯', title: tr(a.val1Title), desc: tr(a.val1Desc) },
+    { icon: '🌿', title: tr(a.val2Title), desc: tr(a.val2Desc) },
+    { icon: '🤝', title: tr(a.val3Title), desc: tr(a.val3Desc) },
+    { icon: '🌐', title: tr(a.val4Title), desc: tr(a.val4Desc) },
+  ]
+
+  const TEAM = [
+    { avatar: '🧑‍💻', name: tr(a.team1Name), role: tr(a.team1Role), bio: tr(a.team1Bio) },
+    { avatar: '🔬',   name: tr(a.team2Name), role: tr(a.team2Role), bio: tr(a.team2Bio) },
+    { avatar: '🌿',   name: tr(a.team3Name), role: tr(a.team3Role), bio: tr(a.team3Bio) },
+  ]
+
   return (
     <div className="min-h-screen bg-gray-50">
 
@@ -30,13 +34,13 @@ export default function About() {
         <div className="absolute bottom-0 left-0 w-64 h-64 bg-green-300/10 rounded-full translate-y-1/2 -translate-x-1/3 pointer-events-none" />
         <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm text-green-200 px-4 py-2 rounded-full text-sm font-medium mb-6 border border-white/20">
-            🌿 Our Story
+            🌿 {tr(a.tag)}
           </div>
           <h1 className="text-4xl sm:text-6xl font-extrabold mb-6 leading-tight">
-            About <span className="text-green-300">WildExplore</span>
+            {tr(a.title)}
           </h1>
           <p className="text-green-100 text-lg sm:text-xl leading-relaxed max-w-2xl mx-auto">
-            A passion project born from the belief that knowledge about wildlife should be free, beautiful, and available in every language.
+            {tr(a.subtitle)}
           </p>
         </div>
         <div className="absolute bottom-0 left-0 right-0">
@@ -50,24 +54,20 @@ export default function About() {
       <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
           <div>
-            <h2 className="text-3xl font-extrabold text-green-900 mb-4">Our Mission</h2>
-            <p className="text-gray-600 leading-relaxed mb-4">
-              WildExplore is a comprehensive wildlife database designed to document, preserve and share knowledge about the incredible diversity of animals on Earth.
-            </p>
-            <p className="text-gray-600 leading-relaxed mb-6">
-              From the taxonomy of a hippopotamus to the conservation status of a bald eagle — we believe this knowledge belongs to everyone, not just scientists.
-            </p>
+            <h2 className="text-3xl font-extrabold text-green-900 mb-4">{tr(a.missionTitle)}</h2>
+            <p className="text-gray-600 leading-relaxed mb-4">{tr(a.mission1)}</p>
+            <p className="text-gray-600 leading-relaxed mb-6">{tr(a.mission2)}</p>
             <Link to="/animals"
               className="inline-flex items-center gap-2 bg-green-700 hover:bg-green-800 text-white font-semibold px-6 py-3 rounded-xl transition-all text-sm">
-              Explore the Database →
+              {tr(a.exploreBtn)}
             </Link>
           </div>
           <div className="grid grid-cols-2 gap-4">
             {STATS.map(s => (
-              <div key={s.label} className="bg-white rounded-2xl p-6 text-center shadow-sm border border-green-100">
+              <div key={s.labelKey} className="bg-white rounded-2xl p-6 text-center shadow-sm border border-green-100">
                 <div className="text-4xl mb-2">{s.icon}</div>
                 <div className="text-2xl font-extrabold text-green-800">{s.value}</div>
-                <div className="text-sm text-gray-500 mt-1">{s.label}</div>
+                <div className="text-sm text-gray-500 mt-1">{tr(a[s.labelKey])}</div>
               </div>
             ))}
           </div>
@@ -78,8 +78,8 @@ export default function About() {
       <section className="bg-green-50 py-16">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-extrabold text-green-900">What We Stand For</h2>
-            <p className="text-gray-500 mt-2">The principles that guide everything we build</p>
+            <h2 className="text-3xl font-extrabold text-green-900">{tr(a.valuesTitle)}</h2>
+            <p className="text-gray-500 mt-2">{tr(a.valuesSub)}</p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             {VALUES.map(v => (
@@ -98,8 +98,8 @@ export default function About() {
       {/* Team */}
       <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="text-center mb-12">
-          <h2 className="text-3xl font-extrabold text-green-900">Behind WildExplore</h2>
-          <p className="text-gray-500 mt-2">The people and community that make this possible</p>
+          <h2 className="text-3xl font-extrabold text-green-900">{tr(a.teamTitle)}</h2>
+          <p className="text-gray-500 mt-2">{tr(a.teamSub)}</p>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
           {TEAM.map(m => (
@@ -116,23 +116,21 @@ export default function About() {
       {/* Bottom CTA */}
       <section className="bg-gradient-to-r from-green-800 to-green-600 py-14 text-white text-center">
         <div className="max-w-2xl mx-auto px-4">
-          <h2 className="text-2xl sm:text-3xl font-extrabold mb-3">Join the Journey</h2>
-          <p className="text-green-200 text-sm sm:text-base mb-6">
-            Explore thousands of species, discover rare facts, and help us build the most complete wildlife database on the web.
-          </p>
+          <h2 className="text-2xl sm:text-3xl font-extrabold mb-3">{tr(a.ctaTitle)}</h2>
+          <p className="text-green-200 text-sm sm:text-base mb-6">{tr(a.ctaDesc)}</p>
           <div className="flex flex-wrap justify-center gap-3">
             <Link to="/animals" className="bg-white text-green-800 font-bold px-7 py-3 rounded-xl hover:bg-green-50 transition-all shadow-md text-sm">
-              Browse Animals
+              {tr(a.browseBtn)}
             </Link>
             <Link to="/contact" className="border border-white/40 backdrop-blur-sm text-white font-semibold px-7 py-3 rounded-xl hover:bg-white/10 transition-all text-sm">
-              Contact Us
+              {tr(a.contactBtn)}
             </Link>
           </div>
         </div>
       </section>
 
       <footer className="bg-green-950 text-green-400 text-center py-5 text-xs sm:text-sm px-4">
-        <p>© 2026 WildExplore — Celebrating the diversity of wildlife on Earth 🌿</p>
+        <p>{tr(t.home.footerText)}</p>
       </footer>
     </div>
   )

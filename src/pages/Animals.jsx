@@ -26,11 +26,15 @@ export default function Animals() {
     setSearchParams(p)
   }
 
-  // Normalise MongoDB _id → id so Link paths work
-  const list = useMemo(
-    () => animals.map(a => ({ ...a, id: String(a._id || a.id) })),
-    [animals]
-  )
+  // Normalise MongoDB _id → id, then sort: oldest per category first
+  const list = useMemo(() => {
+    const mapped = animals.map(a => ({ ...a, id: String(a._id || a.id) }))
+    // Sort by createdAt ascending (oldest first) within each category
+    return mapped.sort((a, b) => {
+      if (a.category !== b.category) return 0 // keep category grouping from filter
+      return new Date(a.createdAt) - new Date(b.createdAt)
+    })
+  }, [animals])
 
   const filtered = useMemo(() => list.filter(a => {
     const matchCat    = activeCategory === 'all' || a.category === activeCategory

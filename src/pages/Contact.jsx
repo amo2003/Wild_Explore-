@@ -1,24 +1,23 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { useLang } from '../context/LanguageContext'
 
 const CONTACT_INFO = [
-  { icon: '📧', label: 'Email', value: 'amodindupa@gmail.com', href: 'mailto:amodindupa@gmail.com' },
-  { icon: '🐙', label: 'GitHub', value: 'github.com/amo2003/Wild_Explore-', href: 'https://github.com/amo2003/Wild_Explore-' },
-  { icon: '🌍', label: 'Website', value: 'wild-explore.vercel.app', href: 'https://wild-explore.vercel.app' },
-]
-
-const TOPICS = [
-  'General Inquiry',
-  'Data Correction / Scientific Accuracy',
-  'New Animal Suggestion',
-  'Bug Report',
-  'Partnership / Collaboration',
-  'Other',
+  { icon: '📧', label: 'Email',   value: 'amodindupa@gmail.com',              href: 'mailto:amodindupa@gmail.com' },
+  { icon: '🐙', label: 'GitHub',  value: 'github.com/amo2003/Wild_Explore-',  href: 'https://github.com/amo2003/Wild_Explore-' },
+  { icon: '🌍', label: 'Website', value: 'wild-explore.vercel.app',           href: 'https://wild-explore.vercel.app' },
 ]
 
 export default function Contact() {
+  const { tr, t } = useLang()
+  const c = t.contact
   const [form, setForm] = useState({ name: '', email: '', topic: '', message: '' })
   const [sent, setSent] = useState(false)
+
+  const TOPICS = [
+    tr(c.topic1), tr(c.topic2), tr(c.topic3),
+    tr(c.topic4), tr(c.topic5), tr(c.topic6),
+  ]
 
   function handleChange(e) {
     setForm(prev => ({ ...prev, [e.target.name]: e.target.value }))
@@ -26,7 +25,6 @@ export default function Contact() {
 
   function handleSubmit(e) {
     e.preventDefault()
-    // Opens default email client with pre-filled data
     const subject = encodeURIComponent(`[WildExplore] ${form.topic || 'Contact'} — ${form.name}`)
     const body = encodeURIComponent(`Name: ${form.name}\nEmail: ${form.email}\nTopic: ${form.topic}\n\nMessage:\n${form.message}`)
     window.location.href = `mailto:amodindupa@gmail.com?subject=${subject}&body=${body}`
@@ -46,14 +44,10 @@ export default function Contact() {
         </div>
         <div className="relative max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm text-green-200 px-4 py-2 rounded-full text-sm font-medium mb-6 border border-white/20">
-            💬 Get in Touch
+            💬 {tr(c.tag)}
           </div>
-          <h1 className="text-4xl sm:text-6xl font-extrabold mb-4">
-            Contact <span className="text-green-300">Us</span>
-          </h1>
-          <p className="text-green-100 text-lg leading-relaxed">
-            Have a question, spotted an error, or want to collaborate? We'd love to hear from you.
-          </p>
+          <h1 className="text-4xl sm:text-6xl font-extrabold mb-4">{tr(c.title)}</h1>
+          <p className="text-green-100 text-lg leading-relaxed">{tr(c.subtitle)}</p>
         </div>
         <div className="absolute bottom-0 left-0 right-0">
           <svg viewBox="0 0 1440 50" fill="none" className="w-full">
@@ -68,29 +62,24 @@ export default function Contact() {
           {/* Left — contact info */}
           <div className="flex flex-col gap-5">
             <div>
-              <h2 className="text-xl font-extrabold text-green-900 mb-1">Reach Out</h2>
-              <p className="text-gray-500 text-sm leading-relaxed">
-                We typically respond within 24–48 hours. For data corrections, please include the animal name and source.
-              </p>
+              <h2 className="text-xl font-extrabold text-green-900 mb-1">{tr(c.reachTitle)}</h2>
+              <p className="text-gray-500 text-sm leading-relaxed">{tr(c.reachDesc)}</p>
             </div>
 
-            {CONTACT_INFO.map(c => (
-              <a key={c.label} href={c.href} target="_blank" rel="noreferrer"
+            {CONTACT_INFO.map(ci => (
+              <a key={ci.label} href={ci.href} target="_blank" rel="noreferrer"
                 className="flex items-center gap-4 bg-white rounded-2xl p-4 border border-green-100 shadow-sm hover:shadow-md hover:border-green-300 transition-all group">
-                <span className="text-2xl w-10 h-10 bg-green-50 rounded-xl flex items-center justify-center flex-shrink-0">{c.icon}</span>
+                <span className="text-2xl w-10 h-10 bg-green-50 rounded-xl flex items-center justify-center flex-shrink-0">{ci.icon}</span>
                 <div className="min-w-0">
-                  <p className="text-xs text-gray-400 font-medium uppercase tracking-wide">{c.label}</p>
-                  <p className="text-sm font-semibold text-green-800 group-hover:text-green-600 truncate transition-colors">{c.value}</p>
+                  <p className="text-xs text-gray-400 font-medium uppercase tracking-wide">{ci.label}</p>
+                  <p className="text-sm font-semibold text-green-800 group-hover:text-green-600 truncate transition-colors">{ci.value}</p>
                 </div>
               </a>
             ))}
 
-            {/* Fun fact */}
             <div className="bg-green-50 rounded-2xl p-5 border border-green-100 mt-2">
-              <p className="text-xs font-bold text-green-700 uppercase tracking-wide mb-2">🦁 Did you know?</p>
-              <p className="text-sm text-gray-600 leading-relaxed">
-                WildExplore covers animals from all 6 continents, with data on taxonomy, habitat, diet, and conservation status in 3 languages.
-              </p>
+              <p className="text-xs font-bold text-green-700 uppercase tracking-wide mb-2">{tr(c.didYouKnow)}</p>
+              <p className="text-sm text-gray-600 leading-relaxed">{tr(c.funFact)}</p>
             </div>
           </div>
 
@@ -99,60 +88,56 @@ export default function Contact() {
             {sent ? (
               <div className="bg-white rounded-2xl shadow-md border border-green-100 p-10 text-center">
                 <div className="text-6xl mb-4">📬</div>
-                <h3 className="text-2xl font-extrabold text-green-900 mb-2">Message Ready!</h3>
-                <p className="text-gray-500 text-sm mb-6">
-                  Your email client opened with the message pre-filled. Just hit send!
-                </p>
+                <h3 className="text-2xl font-extrabold text-green-900 mb-2">{tr(c.sentTitle)}</h3>
+                <p className="text-gray-500 text-sm mb-6">{tr(c.sentDesc)}</p>
                 <div className="flex flex-col sm:flex-row gap-3 justify-center">
                   <button onClick={() => setSent(false)}
                     className="border border-green-700 text-green-700 hover:bg-green-50 font-semibold px-6 py-3 rounded-xl transition-all text-sm">
-                    Send Another
+                    {tr(c.sendAnother)}
                   </button>
                   <Link to="/" className="bg-green-700 hover:bg-green-800 text-white font-semibold px-6 py-3 rounded-xl transition-all text-sm text-center">
-                    Back to Home
+                    {tr(c.backHome)}
                   </Link>
                 </div>
               </div>
             ) : (
               <div className="bg-white rounded-2xl shadow-md border border-green-100 p-6 sm:p-8">
-                <h2 className="text-xl font-extrabold text-green-900 mb-6">Send a Message</h2>
+                <h2 className="text-xl font-extrabold text-green-900 mb-6">{tr(c.formTitle)}</h2>
                 <form onSubmit={handleSubmit} className="flex flex-col gap-4">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="text-xs font-semibold text-green-900 mb-1 block">Your Name <span className="text-red-500">*</span></label>
+                      <label className="text-xs font-semibold text-green-900 mb-1 block">{tr(c.nameLabel)} <span className="text-red-500">*</span></label>
                       <input type="text" name="name" value={form.name} onChange={handleChange} required
-                        placeholder="e.g. Amod Indupa" className={inputClass} />
+                        placeholder={tr(c.namePh)} className={inputClass} />
                     </div>
                     <div>
-                      <label className="text-xs font-semibold text-green-900 mb-1 block">Email Address <span className="text-red-500">*</span></label>
+                      <label className="text-xs font-semibold text-green-900 mb-1 block">{tr(c.emailLabel)} <span className="text-red-500">*</span></label>
                       <input type="email" name="email" value={form.email} onChange={handleChange} required
                         placeholder="you@example.com" className={inputClass} />
                     </div>
                   </div>
 
                   <div>
-                    <label className="text-xs font-semibold text-green-900 mb-1 block">Topic</label>
+                    <label className="text-xs font-semibold text-green-900 mb-1 block">{tr(c.topicLabel)}</label>
                     <select name="topic" value={form.topic} onChange={handleChange} className={inputClass}>
-                      <option value="">Select a topic</option>
-                      {TOPICS.map(t => <option key={t} value={t}>{t}</option>)}
+                      <option value="">{tr(c.topicPh)}</option>
+                      {TOPICS.map(tp => <option key={tp} value={tp}>{tp}</option>)}
                     </select>
                   </div>
 
                   <div>
-                    <label className="text-xs font-semibold text-green-900 mb-1 block">Message <span className="text-red-500">*</span></label>
+                    <label className="text-xs font-semibold text-green-900 mb-1 block">{tr(c.msgLabel)} <span className="text-red-500">*</span></label>
                     <textarea name="message" value={form.message} onChange={handleChange} required rows={5}
-                      placeholder="Tell us what's on your mind…"
+                      placeholder={tr(c.msgPh)}
                       className={`${inputClass} resize-none`} />
                   </div>
 
                   <button type="submit"
                     className="w-full bg-green-700 hover:bg-green-800 text-white font-bold py-3.5 rounded-xl transition-all shadow-md text-sm sm:text-base flex items-center justify-center gap-2">
-                    📨 Send Message
+                    {tr(c.sendBtn)}
                   </button>
 
-                  <p className="text-xs text-gray-400 text-center">
-                    This will open your email client with the message pre-filled.
-                  </p>
+                  <p className="text-xs text-gray-400 text-center">{tr(c.emailNote)}</p>
                 </form>
               </div>
             )}
@@ -161,7 +146,7 @@ export default function Contact() {
       </div>
 
       <footer className="bg-green-950 text-green-400 text-center py-5 text-xs sm:text-sm px-4">
-        <p>© 2026 WildExplore — Celebrating the diversity of wildlife on Earth 🌿</p>
+        <p>{tr(t.home.footerText)}</p>
       </footer>
     </div>
   )

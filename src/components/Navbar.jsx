@@ -14,6 +14,7 @@ export default function Navbar() {
     { to: '/',          label: tr(t.nav.home) },
     { to: '/animals',   label: tr(t.nav.animals) },
     { to: '/map',       label: tr(t.nav.map) },
+    { to: '/compare',   label: tr(t.nav.compare) },
     { to: '/identify',  label: tr(t.nav.aiIdentify) },
     { to: '/about',     label: tr(t.nav.about) },
     { to: '/contact',   label: tr(t.nav.contact) },
